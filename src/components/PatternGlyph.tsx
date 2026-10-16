@@ -23,17 +23,3 @@ const paths: Record<number, string> = {
 export function PatternGlyph({chapter}:{chapter:number}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[chapter] ?? paths[1]}/></svg>;
 }
-
-export function PatternSigil({chapter}:{chapter:number}) {
-  return <div className="pattern-sigil" aria-hidden="true">
-    <svg className="sigil-circuit" viewBox="0 0 200 150" fill="none">
-      <path className="circuit-guide" d="M0 75h35m130 0h35M100 0v23m0 104v23M0 25h38l20 20m84 60 20 20h38M12 125h27l19-20m84-60 20-20h26"/>
-      <path className="circuit-main" d="M15 75h45m80 0h45M100 17v21m0 74v21"/>
-      <path className="circuit-outline" d="m100 26 43 25v48l-43 25-43-25V51z"/>
-      <path className="circuit-core" d="m100 38 32 18v37l-32 19-32-19V56z"/>
-      <circle cx="15" cy="75" r="3"/><circle cx="185" cy="75" r="3"/><circle cx="100" cy="17" r="2"/><circle cx="100" cy="133" r="2"/>
-    </svg>
-    <span className="sigil-glyph"><PatternGlyph chapter={chapter}/></span>
-    <span className="sigil-caption">PATTERN_{String(chapter).padStart(2,'0')}</span>
-  </div>;
-}
