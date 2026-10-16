@@ -203,6 +203,14 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Interactive lab (generated at build time)
+node_modules/
+public/lessons/*.json
+src/catalog.json
+playwright-report/
+test-results/
+.superpowers/
+
 # Ruff stuff:
 .ruff_cache/
 
