@@ -101,7 +101,8 @@ def increasing_path(grid):
 
 def word_transform(start, end, words):
     from collections import deque
-    remaining = set(words)
+    candidates = sorted(set(words))
+    remaining = set(candidates)
     if end not in remaining:
         return 0
     queue = deque([(start, 1)])
@@ -110,7 +111,9 @@ def word_transform(start, end, words):
         current, distance = queue.popleft()
         if current == end:
             return distance
-        for word in sorted(remaining):
+        for word in candidates:
+            if word not in remaining:
+                continue
             differences = sum(a != b for a, b in zip(current, word))
             if len(word) == len(current) and differences == 1:
                 remaining.remove(word)  # Первое посещение в BFS имеет минимальную длину.
@@ -181,13 +184,18 @@ def shortest_path(n, edges, start):
 def connect_dots(points):
     n = len(points)
     dist, visited, result = [float('inf')] * n, set(), 0
+    parent, chosen = [None] * n, []
     dist[0] = 0
     for step in range(n):
         current = min((i for i in range(n) if i not in visited), key=lambda i: dist[i])
         visited.add(current)
         result += dist[current]
+        if parent[current] is not None:
+            chosen.append([parent[current], current])  # Это ребро стало частью минимального остова.
         for i, point in enumerate(points):
             if i not in visited:
                 weight = abs(points[current][0] - point[0]) + abs(points[current][1] - point[1])
-                dist[i] = min(dist[i], weight)  # Лучшее ребро из уже соединённой части к точке i.
+                if weight < dist[i]:
+                    dist[i] = weight  # Лучшее ребро из уже соединённой части к точке i.
+                    parent[i] = current
     return result

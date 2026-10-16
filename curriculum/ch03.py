@@ -44,7 +44,7 @@ def linked_intersection(a, b, tail):
 
 def lru_cache(capacity, ops):
     from curriculum.structures import Node
-    root = Node('LRU')
+    root = Node('LRU', 'lru')
     root.next = root.prev = root
     cache, result = {}, []
     def unlink(node):
@@ -70,7 +70,7 @@ def lru_cache(capacity, ops):
                 unlink(node)
                 node.value = [key, op[2]]
             else:
-                node = Node([key, op[2]])
+                node = Node([key, op[2]], 'lru')
                 cache[key] = node
             append(node)
             if len(cache) > capacity:

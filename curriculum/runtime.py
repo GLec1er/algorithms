@@ -79,6 +79,33 @@ def trace(function, args, limit=1800):
     end = start + len(lines)
     structures.NODES.clear()
     frames, last_root = [], None
+    array_history, next_identity = {}, 0
+
+    def identities(state):
+        nonlocal next_identity
+        result = {}
+        for name, values in state.items():
+            if not isinstance(values, list) or any(isinstance(v, (list, dict)) for v in values):
+                continue
+            old_values, old_ids = array_history.get(name, ([], []))
+            assigned, used = [None] * len(values), set()
+            for i, value in enumerate(values):
+                if i < len(old_values) and old_values[i] == value:
+                    assigned[i] = old_ids[i]
+                    used.add(i)
+            for i, value in enumerate(values):
+                if assigned[i] is not None:
+                    continue
+                match = next((j for j, old in enumerate(old_values) if j not in used and old == value), None)
+                if match is None:
+                    assigned[i] = f'e{next_identity}'
+                    next_identity += 1
+                else:
+                    assigned[i] = old_ids[match]
+                    used.add(match)
+            result[name] = assigned
+            array_history[name] = (copy.deepcopy(values), assigned)
+        return result
 
     def capture(frame, event, value):
         nonlocal last_root
@@ -100,7 +127,7 @@ def trace(function, args, limit=1800):
         for scope in chain:
             state.update(locals_snapshot(scope.f_locals))
         line = max(1, min(len(lines), frame.f_lineno - start + 1))
-        item = dict(line=line, message=instruction(lines[line - 1]), state=state, nodes=node_snapshot(),
+        item = dict(line=line, message=instruction(lines[line - 1]), state=state, nodes=node_snapshot(), arrays=identities(state),
                     calls=[dict(name=f.f_code.co_name, line=f.f_lineno - start + 1) for f in chain], done=False)
         if event == 'return':
             item['message'] = f"Возврат из {frame.f_code.co_name}: {json.dumps(freeze(value), ensure_ascii=False)}"

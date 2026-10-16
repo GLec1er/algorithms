@@ -2,6 +2,24 @@ import unittest
 
 
 class TraceTests(unittest.TestCase):
+    def test_minimum_spanning_tree_records_actual_selected_edges(self):
+        from curriculum.runtime import trace
+        from curriculum.ch13 import connect_dots
+        recorded = trace(connect_dots, {'points': [[0, 0], [2, 2], [3, 1]]})
+        final = recorded['frames'][-1]
+        self.assertEqual(final['state']['chosen'], [[0, 1], [1, 2]])
+        self.assertEqual(final['result'], 6)
+
+    def test_swapping_array_values_moves_element_identity(self):
+        from curriculum.runtime import trace
+        from curriculum.ch01 import shift_zeros
+        recorded = trace(shift_zeros, {'a': [0, 7, 0, 3]})
+        first = recorded['frames'][0]
+        final = recorded['frames'][-1]
+        self.assertEqual(final['state']['a'], [7, 3, 0, 0])
+        self.assertEqual(final['arrays']['a'][0], first['arrays']['a'][1])
+        self.assertEqual(final['arrays']['a'][1], first['arrays']['a'][3])
+
     def test_cycles_keep_stable_node_identity(self):
         from curriculum.catalog import LESSONS
         from curriculum.runtime import compile_lesson

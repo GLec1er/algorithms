@@ -1,0 +1,26 @@
+{
+  "name": "coding-patterns-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "lessons": "python3 scripts/build_lessons.py",
+    "dev": "npm run lessons && vite --host 127.0.0.1",
+    "check": "npm run lessons && npm test && tsc --noEmit",
+    "build": "npm run lessons && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "python3 -m unittest discover -s tests -v",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
+  }
+}

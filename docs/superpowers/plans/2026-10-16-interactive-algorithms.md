@@ -71,3 +71,9 @@
 - Ruling: use the task-specific clean clone on `feat/interactive-patterns`; a second worktree adds no isolation benefit because this clone has no unrelated work.
 - Ruling: compile traces from actual Python execution instead of duplicating algorithms in TypeScript. User-facing behavior is preserved; custom inputs remain outside scope. Cost: changes to examples require rebuilding static assets.
 - Pre-flight: Task 1 frame and catalog contracts are consumed by Task 2; Task 3 uses the same build/check commands. No conflicting interfaces found.
+- Task 1: complete — 101 algorithms, 202 expected outputs, bounded deterministic traces; Python suite passes.
+- Task 2: complete — production build and full browser checks pass; 23 scene configurations checked at desktop/mobile widths.
+- Task 3: checks, workflow and documentation complete; publication in progress.
+- Final review: author review following user's no-unrequested-subagents preference; no independent review claimed.
+- Final fixes: keyboard focus and DP/infection color semantics were reproduced by failing browser assertions, corrected, then the full browser suite passed.
+- Ruling: official online catalog includes authors' bonus problems; all 101 listed problems remain covered, with no extra tasks outside that catalog promised.
