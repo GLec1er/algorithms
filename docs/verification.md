@@ -12,7 +12,7 @@
 
 ## Evidence from the final local tree
 
-`npm test`: 12 tests pass. The curriculum checks all 202 examples. Additional independent small-domain checks exercise duplicate/empty binary-search boundaries, next-greater elements, sliding-window maxima, prefix sums, interval endpoint conventions, inherited BST bounds, all-negative tree paths and the triangle rule against actual three-neighbor row construction.
+`npm test`: 13 tests pass. The curriculum checks all 202 examples. Additional independent small-domain checks exercise duplicate/empty binary-search boundaries, next-greater elements, sliding-window maxima, prefix sums, interval endpoint conventions, inherited BST bounds, all-negative tree paths and the triangle rule against actual three-neighbor row construction.
 
 Trace checks cover node cycles/identity, stable array identity during swaps, selected minimum-spanning-tree edges, isolated input copies, source-line validity, terminal results and an enforced step limit. Repeated compilation of all 101 payloads produced identical structures.
 
@@ -33,6 +33,7 @@ Trace checks cover node cycles/identity, stable array identity during swaps, sel
 1. Transport buttons retained focus and suppressed arrow shortcuts. A browser assertion failed with step 1 instead of 2, then passed after narrowing the focus exclusion.
 2. Shared grid rendering treated every numeric 2 as an infection state, affecting DP colors. A browser assertion found five falsely marked cells; infection coloring is now explicitly enabled only for Matrix Infection.
 3. The initial CSS contained an invalid empty data import. Production build rejected it; it was removed and the build passed.
+4. A quoted `#` was incorrectly parsed as a comment in serialization-step narration. A failing unit test reproduced this; Python tokenization now distinguishes string contents and comments.
 
 ## Review and decisions
 
@@ -46,4 +47,4 @@ The task-specific clean clone was used on `feat/interactive-patterns`; no unrela
 
 The browser replays prepared, verified examples; it does not execute arbitrary Python or accept arbitrary input structures. Input adapters and visualization recording are excluded from the stated algorithm complexity. Large structures scroll inside the visualization. The test suite establishes the checked examples and selected invariants, not a formal proof for every possible input.
 
-Deployment success and public URL availability are recorded by the GitHub Actions run and the final handoff after publication.
+Initial deployment: [successful GitHub Actions run](https://github.com/GLec1er/algorithms/actions/runs/38849707305). The complete browser suite also passed against https://glec1er.github.io/algorithms/ after publication. The final narration correction is covered by the 13-test Python suite and the subsequent deployment run.

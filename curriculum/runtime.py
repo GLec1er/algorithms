@@ -2,10 +2,12 @@
 import copy
 import importlib
 import inspect
+import io
 import json
 import math
 import sys
 import types
+import tokenize
 from collections import deque
 from . import structures
 
@@ -52,9 +54,17 @@ def node_snapshot():
 
 
 def instruction(source):
-    statement, _, comment = source.strip().partition('#')
-    if comment.strip():
-        return comment.strip()
+    statement = source.strip()
+    try:
+        for token in tokenize.generate_tokens(io.StringIO(statement).readline):
+            if token.type == tokenize.COMMENT:
+                comment = token.string[1:].strip()
+                statement = statement[:token.start[1]].rstrip()
+                if comment:
+                    return comment
+                break
+    except (tokenize.TokenError, IndentationError):
+        pass  # A line belonging to a multiline statement still gets a safe fallback.
     if statement.startswith('return'):
         return 'Возвращаем ответ текущего вызова.'
     if statement.startswith(('if ', 'elif ', 'while ')):

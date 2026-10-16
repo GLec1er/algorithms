@@ -2,6 +2,12 @@ import unittest
 
 
 class TraceTests(unittest.TestCase):
+    def test_hash_inside_python_string_is_not_treated_as_teaching_comment(self):
+        from curriculum.runtime import instruction
+        self.assertTrue(instruction("tokens.append('#')").startswith('Добавляем'))
+        self.assertIn("token == '#'", instruction("if token == '#':"))
+        self.assertEqual(instruction("tokens.append('#')  # Сохраняем пустого ребёнка."), 'Сохраняем пустого ребёнка.')
+
     def test_minimum_spanning_tree_records_actual_selected_edges(self):
         from curriculum.runtime import trace
         from curriculum.ch13 import connect_dots
