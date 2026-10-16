@@ -55,6 +55,8 @@ try {
   await page.getByLabel('Шаг анимации').waitFor();
   await page.getByPlaceholder('Найти задачу или паттерн').fill('');
   await page.getByLabel('Шаг анимации').fill('3');
+  await page.getByRole('heading',{name:'Позиция вставки',exact:true}).click();
+  await page.evaluate(()=>window.scrollTo(0,0));
   fs.mkdirSync('test-results',{recursive:true});
   await page.screenshot({path:'test-results/desktop.png',fullPage:true});
   const scenes=['pair_sum_sorted','pair_sum_unsorted','linked_reversal','happy_number','unique_substring','insertion_index','valid_parentheses','stream_median','merge_intervals','product_except','invert_tree','design_trie','shortest_path','permutations','lcs','gas_stations','sort_array','swap_bits','collinear_points','triangle_numbers','josephus','matrix_infection','n_queens'];
@@ -65,12 +67,18 @@ try {
     await page.getByLabel('Шаг анимации').fill(String(Math.floor(max*.65)));
     await page.locator('.visual-panel').screenshot({path:`test-results/scene-${id}.png`,animations:'disabled'});
   }
-  await page.setViewportSize({width:390,height:844});
-  for(const id of scenes){
-    await page.goto(base+'#/problem/'+id);
-    await page.getByLabel('Шаг анимации').waitFor();
-    const bodyWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
-    assert.ok(bodyWidth<=392,`Horizontal page overflow: ${id}: ${bodyWidth}`);
+  for(const width of [320,390]){
+    await page.setViewportSize({width,height:844});
+    for(const id of scenes){
+      await page.goto(base+'#/problem/'+id);
+      await page.getByLabel('Шаг анимации').waitFor();
+      const layout=await page.evaluate(()=>{
+        const transport=document.querySelector('.transport');
+        return {body:document.documentElement.scrollWidth,transport:transport.scrollWidth,controls:transport.clientWidth};
+      });
+      assert.ok(layout.body<=width+2,`Horizontal page overflow: ${id} at ${width}: ${layout.body}`);
+      assert.ok(layout.transport<=layout.controls+2,`Transport overflow: ${id} at ${width}`);
+    }
   }
   await page.screenshot({path:'test-results/mobile.png',fullPage:true});
   const isolated=await browser.newContext();
@@ -84,5 +92,5 @@ try {
   await noStorage.getByText('Задача не найдена').waitFor();
   await isolated.close();
   assert.deepEqual(errors,[]);
-  console.log('Browser checks passed: player and keyboard, storage and storage denial, search, invalid routes, 101 lessons × 2 examples, 23 desktop/mobile scenes.');
+  console.log('Browser checks passed: player and keyboard, storage and storage denial, search, invalid routes, 101 lessons × 2 examples, 23 scenes at desktop, 320 px and 390 px.');
 } finally { await browser.close(); }
