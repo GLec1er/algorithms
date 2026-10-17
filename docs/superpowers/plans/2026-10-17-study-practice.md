@@ -64,3 +64,6 @@ New tasks only close the weekday goal. No invented historical dates. At least fo
 - Task 1: complete — missing progress module reproduced RED; 9 Node tests GREEN; existing 13 Python tests and TypeScript pass. Legacy dates remain null; first-completion history persists through repeat marks.
 
 - Task 2: complete — 120 missing-content contract failures RED; 404 independently specified examples compile into 14,813 states; 14 Python tests, 9 progress tests and TypeScript GREEN. All 19 guides include a worked example.
+
+- Task 3: complete — calendar navigation RED→GREEN; all 404 browser examples and 19 guides pass. Added RED→GREEN coverage for course completion and read-only storage. Cross-tab progress and 320/390 px layouts verified.
+- Task 4: author review complete; no independent reviewer claimed under the user preference. Publication pending.

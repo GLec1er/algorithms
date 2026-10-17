@@ -5,7 +5,8 @@ export type Frame = { line:number; message:string; state:Record<string,Value>; n
 export type Example = {label:string; args:Record<string,Value>; expected:Value; frames:Frame[]};
 export type Payload = {id:string; code:string; support?:string; examples:Example[]};
 export type Lesson = {id:string;chapter:number;title:string;ru:string;statement:string;idea:string;time:string;space:string;scene:string;difficulty:string;source:string};
-export type Chapter = {id:number;title:string;ru:string;use:string;invariant:string;pitfall:string};
+export type PatternGuideData = {intuition:string;signals:string[];steps:string[];example:{input:string;trace:string[];answer:string};compare:string;pitfalls:string[]};
+export type Chapter = {id:number;title:string;ru:string;use:string;invariant:string;pitfall:string;guide:PatternGuideData};
 export const isRef = (v:Value|undefined):v is Ref => !!v && !Array.isArray(v) && typeof v === 'object' && typeof v.ref === 'number';
 export function pretty(v:Value|undefined):string {
   if (v === undefined) return '—';

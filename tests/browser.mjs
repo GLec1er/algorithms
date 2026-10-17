@@ -1,6 +1,7 @@
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { checkPractice } from './practice-browser.mjs';
 
 const base = process.env.LAB_URL || 'http://127.0.0.1:4173/algorithms/';
 const browser = await chromium.launch({ headless:true, ...(process.env.CI ? {} : {channel:'chrome'}) });
@@ -8,6 +9,8 @@ const page = await browser.newPage({viewport:{width:1440,height:1000}});
 const errors=[];
 page.on('pageerror', error=>errors.push(error.message));
 try {
+  fs.mkdirSync('test-results',{recursive:true});
+  await checkPractice(browser,base);
   await page.goto(base+'#/problem/lcs');
   await page.getByLabel('Шаг анимации').waitFor();
   await page.getByLabel('Шаг анимации').fill(await page.getByLabel('Шаг анимации').getAttribute('max'));
@@ -45,7 +48,14 @@ try {
     await page.goto(base+'#/problem/'+lesson.id);
     await page.getByRole('heading',{name:lesson.ru,exact:true}).waitFor();
     await page.getByLabel('Шаг анимации').waitFor();
-    for(const example of ['0','1']){
+    const options=await page.getByLabel('Пример').locator('option').count();
+    assert.ok(options>=4,lesson.id+' has varied examples');
+    if(catalog.lessons.find(l=>l.chapter===lesson.chapter).id===lesson.id){
+      await page.locator('.pattern-intro summary').click();
+      await page.getByRole('heading',{name:'Мини-разбор',exact:true}).waitFor();
+      assert.ok((await page.locator('.guide-example li').count())>=3);
+    }
+    for(const example of Array.from({length:options},(_,i)=>String(i))){
       await page.getByLabel('Пример').selectOption(example);
       await page.getByLabel('Шаг анимации').fill(await page.getByLabel('Шаг анимации').getAttribute('max'));
       await page.getByText('Результат совпадает',{exact:true}).waitFor();
@@ -78,6 +88,8 @@ try {
       });
       assert.ok(layout.body<=width+2,`Horizontal page overflow: ${id} at ${width}: ${layout.body}`);
       assert.ok(layout.transport<=layout.controls+2,`Transport overflow: ${id} at ${width}`);
+      await page.locator('.pattern-intro summary').click();
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth)<=width+2,`Expanded guide overflow: ${id} at ${width}`);
     }
   }
   await page.screenshot({path:'test-results/mobile.png',fullPage:true});
@@ -92,5 +104,5 @@ try {
   await noStorage.getByText('Задача не найдена').waitFor();
   await isolated.close();
   assert.deepEqual(errors,[]);
-  console.log('Browser checks passed: player and keyboard, storage and storage denial, search, invalid routes, 101 lessons × 2 examples, 23 scenes at desktop, 320 px and 390 px.');
+  console.log('Browser checks passed: player and keyboard, storage and storage denial, search, invalid routes, 101 lessons × all examples, calendar and rewards, 23 scenes at desktop, 320 px and 390 px.');
 } finally { await browser.close(); }

@@ -93,3 +93,11 @@ test('levels and earned achievements use unique tasks and the best weekday strea
   for(const id of ids.slice(5))p=toggleLesson(p,id,'2026-10-24');
   assert.equal(stats(p,'2026-10-24').achievements.find(a=>a.id==='ten').earned,true);
 });
+test('finishing the available curriculum stops future obligations and preserves the final streak',()=>{
+  const p=toggleLesson(toggleLesson(fresh(),'a','2026-10-19'),'b','2026-10-20');
+  const s=practiceStats(p,'2026-10-23',[{id:1,lessonIds:['a','b']}]);
+  assert.equal(s.finished,true);
+  assert.equal(s.currentStreak,2);
+  assert.equal(s.weeklyTarget,2);
+  assert.equal(s.week[2].status,'free');
+});

@@ -4,7 +4,7 @@ export type StudyProgress = {
   completed: string[];
   firstCompletions: Record<string, string | null>;
 };
-export type DayStatus = 'done' | 'bonus' | 'missed' | 'pending' | 'planned' | 'weekend' | 'untracked';
+export type DayStatus = 'done' | 'bonus' | 'missed' | 'pending' | 'planned' | 'weekend' | 'untracked' | 'free';
 export type PracticeChapter = { id: number; lessonIds: string[] };
 
 const isoDay = (date: Date) => date.toISOString().slice(0, 10);
@@ -68,18 +68,23 @@ export function goalStart(progress: StudyProgress): string {
   while (!isWorkday(date)) date = shiftDay(date, 1);
   return date;
 }
-export function dayStatus(progress: StudyProgress, day: string, today: string): DayStatus {
+export function dayStatus(progress: StudyProgress, day: string, today: string, finishedOn?: string): DayStatus {
   if (day < progress.startedOn) return 'untracked';
-  if (day > today) return isWorkday(day) ? 'planned' : 'weekend';
   const count = dailyCounts(progress)[day] ?? 0;
+  if (finishedOn && day >= finishedOn && !count) return 'free';
+  if (day > today) return isWorkday(day) ? 'planned' : 'weekend';
   if (count) return isWorkday(day) ? 'done' : 'bonus';
   if (!isWorkday(day)) return 'weekend';
   return day === today ? 'pending' : 'missed';
 }
 export function practiceStats(progress: StudyProgress, today: string, chapters: PracticeChapter[]) {
   const counts = dailyCounts(progress);
+  const known = chapters.flatMap(ch => ch.lessonIds);
+  const finished = known.length > 0 && known.every(id => Object.hasOwn(progress.firstCompletions, id));
+  const finishedOn = finished ? Object.values(progress.firstCompletions).filter((d): d is string => !!d).sort().at(-1) ?? progress.startedOn : undefined;
+  const lastGoalDay = finishedOn && finishedOn < today ? finishedOn : today;
   let currentStreak = 0, bestStreak = 0;
-  for (let day = goalStart(progress); day <= today; day = shiftDay(day, 1)) {
+  for (let day = goalStart(progress); day <= lastGoalDay; day = shiftDay(day, 1)) {
     if (!isWorkday(day)) continue;
     if (counts[day]) { currentStreak++; bestStreak = Math.max(bestStreak, currentStreak); }
     else if (day !== today) currentStreak = 0;
@@ -88,7 +93,7 @@ export function practiceStats(progress: StudyProgress, today: string, chapters: 
   const monday = shiftDay(basis, -((weekday(basis) + 6) % 7));
   const week = Array.from({ length: 5 }, (_, i) => {
     const date = shiftDay(monday, i);
-    return { date, count: counts[date] ?? 0, status: dayStatus(progress, date, today) };
+    return { date, count: counts[date] ?? 0, status: dayStatus(progress, date, today, finishedOn) };
   });
   const total = Object.keys(progress.firstCompletions).length, xp = total * 100;
   const achievements = [
@@ -97,6 +102,6 @@ export function practiceStats(progress: StudyProgress, today: string, chapters: 
     { id: 'streak', symbol: '↗', title: 'Рабочая серия', description: 'Закрыть цель 5 будней подряд', earned: bestStreak >= 5 },
     { id: 'chapter', symbol: '◇', title: 'Паттерн освоен', description: 'Разобрать все задачи одной главы', earned: chapters.some(ch => ch.lessonIds.length > 0 && ch.lessonIds.every(id => Object.hasOwn(progress.firstCompletions, id))) },
   ];
-  return { total, xp, level: Math.floor(xp / 500) + 1, levelProgress: xp % 500, currentStreak, bestStreak, todayCount: counts[today] ?? 0,
-    week, weeklyMet: week.filter(day => day.status === 'done').length, weeklyTarget: week.filter(day => day.status !== 'untracked').length, achievements };
+  return { total, xp, finished, finishedOn, level: Math.floor(xp / 500) + 1, levelProgress: xp % 500, currentStreak, bestStreak, todayCount: counts[today] ?? 0,
+    week, weeklyMet: week.filter(day => day.status === 'done').length, weeklyTarget: week.filter(day => day.status !== 'untracked' && day.status !== 'free').length, achievements };
 }
