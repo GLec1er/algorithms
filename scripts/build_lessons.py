@@ -17,7 +17,7 @@ def build():
     target.mkdir(parents=True, exist_ok=True)
     examples = states = 0
     for lesson in LESSONS:
-        assert len(lesson['examples']) >= 2
+        assert len(lesson['examples']) >= 4
         payload = compile_lesson(lesson)
         for example in payload['examples']:
             frames = example['frames']

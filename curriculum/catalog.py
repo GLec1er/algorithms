@@ -159,3 +159,13 @@ HARD = {'lru_cache','uniform_substring','median_arrays','evaluate_expression','w
 for lesson in LESSONS:
     lesson['difficulty'] = 'Easy' if lesson['id'] in EASY else 'Hard' if lesson['id'] in HARD else 'Medium'
     lesson['source'] = 'https://bytebytego.com/exercises/coding-patterns'
+
+# Extra fixtures carry literal expected outputs, independent of the algorithms.
+from curriculum.extra_examples import EXTRA_EXAMPLES
+assert set(EXTRA_EXAMPLES) == {lesson['id'] for lesson in LESSONS}
+for lesson in LESSONS:
+    lesson['examples'].extend(EXTRA_EXAMPLES[lesson['id']])
+
+from curriculum.patterns import GUIDES
+for chapter in CHAPTERS:
+    chapter['guide'] = GUIDES[chapter['id']]
