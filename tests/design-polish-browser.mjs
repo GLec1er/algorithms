@@ -1,7 +1,25 @@
 import assert from 'node:assert/strict';
 import {expect,chromium} from '@playwright/test';
 import {openAppearance} from './ui-controls.mjs';
+export async function checkAppearanceFocus(browser,base){
+ const page=await browser.newPage({reducedMotion:'reduce'});
+ try{
+  await page.clock.install({time:new Date('2026-10-19T12:00:00Z')});
+  await page.clock.pauseAt(new Date('2026-10-19T12:00:01Z'));
+  await page.goto(base+'?lang=en#/');
+  await openAppearance(page);
+  const group=page.getByRole('group',{name:'Appearance',exact:true});
+  await group.getByRole('radio',{name:'Light',exact:true}).focus();
+  await page.clock.runFor(32);
+  await expect(group.getByRole('radio',{name:'Light',exact:true})).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(group.getByRole('radio',{name:'Dark',exact:true})).toBeChecked();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Appearance options',exact:true})).toBeFocused();
+ }finally{await page.close();}
+}
 export async function checkDesignPolish(browser,base){
+ await checkAppearanceFocus(browser,base);
  const page=await browser.newPage({viewport:{width:1440,height:1000},colorScheme:'light',reducedMotion:'reduce'});
  try{
   await page.goto(base+'?lang=en#/');

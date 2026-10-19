@@ -1,4 +1,4 @@
-import {useEffect,useId,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useId,useRef,useState} from 'react';
 import {useLocale} from '../i18n';
 import type {ThemePreference} from '../useTheme';
 import SegmentedControl from './SegmentedControl';
@@ -10,7 +10,8 @@ export default function ThemeToggle({value,onChange}:{value:ThemePreference;onCh
  const {locale}=useLocale(),en=locale==='en',py=usePyPreferences(),reduced=useReducedMotion();
  const [open,setOpen]=useState(false),root=useRef<HTMLDivElement>(null),opener=useRef<HTMLButtonElement>(null),panel=useRef<HTMLDivElement>(null),id=useId();
  const labels={system:en?'System':'Системная',light:en?'Light':'Светлая',dark:en?'Dark':'Тёмная'};
- useEffect(()=>{if(!open)return;const frame=requestAnimationFrame(()=>panel.current?.querySelector<HTMLInputElement>('input:checked')?.focus());const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false);};document.addEventListener('pointerdown',outside);return()=>{cancelAnimationFrame(frame);document.removeEventListener('pointerdown',outside);};},[open]);
+ useLayoutEffect(()=>{if(open)panel.current?.querySelector<HTMLInputElement>('input:checked')?.focus();},[open]);
+ useEffect(()=>{if(!open)return;const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false);};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);},[open]);
  return <div className="appearance-control" ref={root} onBlur={event=>{if(event.relatedTarget&&!root.current?.contains(event.relatedTarget as Node))setOpen(false);}}>
   <button ref={opener} className="appearance-trigger" aria-label={en?'Appearance options':'Настройки оформления'} aria-expanded={open} aria-controls={id} aria-haspopup="dialog" onClick={()=>setOpen(v=>!v)}><ThemeIcon mode={value}/><span>{en?'Appearance':'Оформление'}</span><small aria-hidden="true">⌄</small></button>
   {open&&<div ref={panel} className="appearance-panel" role="dialog" id={id} aria-label={en?'Appearance options':'Настройки оформления'} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setOpen(false);opener.current?.focus();}}}>
