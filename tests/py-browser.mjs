@@ -64,7 +64,7 @@ export async function checkPy(browser,base){
   await page.getByLabel('Animation step',{exact:true}).fill(await page.getByLabel('Animation step',{exact:true}).getAttribute('max'));
   await expect(art(page)).toHaveAttribute('data-mode','complete');
   await expect(page.getByRole('button',{name:'Mark as understood',exact:true})).toBeVisible();
-  await page.goto(base+'?lang=en#/calendar');await expect(art(page)).toHaveCount(0);
+  await page.goto(base+'?lang=en#/calendar');await expect(art(page)).toHaveAttribute('data-mode','idle');
   await page.goto(base+'?lang=en#/');await expect(art(page)).toHaveAttribute('data-renderer','mesh',{timeout:10000});
   const glLost=await page.locator('.py-art canvas').evaluate(canvas=>{const gl=canvas.getContext('webgl');const extension=gl?.getExtension('WEBGL_lose_context');if(extension){extension.loseContext();return true;}return false;});
   assert.ok(glLost,'The browser must expose context loss for this recovery check');
@@ -108,11 +108,11 @@ export async function checkPy(browser,base){
   await page.route('**/assets/renderer-*.js',route=>{held=route;});
   await page.goto(base+'?lang=en#/',{waitUntil:'domcontentloaded'});
   await expect.poll(()=>Boolean(held),{timeout:10000}).toBe(true);
-  await page.getByRole('link',{name:'Practice calendar',exact:true}).click();
+  await page.evaluate(()=>{location.hash='#/missing';});
   await expect(art(page)).toHaveCount(0);
   await held.continue();await page.waitForLoadState('networkidle');
   await expect(page.locator('canvas')).toHaveCount(0);
-  await expect(page.getByTestId('xp-total')).toBeVisible();assert.deepEqual(errors,[],'A late graphics import cannot revive an unmounted character');
+  await expect(page.getByRole('heading',{name:'Problem not found',exact:true})).toBeVisible();assert.deepEqual(errors,[],'A late graphics import cannot revive an unmounted character');
  }finally{await delayed.close();}
  console.log('Py: motion/settling, manual steps, hide/restore, preferences, reduced motion, context loss, unavailable graphics, storage denial, and routing passed.');
 }

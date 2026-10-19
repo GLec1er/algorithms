@@ -3,7 +3,7 @@ import {useLocale} from '../../i18n';
 import {usePyPreferences,useReducedMotion} from './PyPreferences';
 import type {PyMode,PyRenderer} from './renderer';
 
-export default function PyMascot({mode,stepToken,variant='lesson'}:{mode:PyMode;stepToken:string|number;variant?:'hero'|'lesson'}){
+export default function PyMascot({mode,stepToken,variant='lesson'}:{mode:PyMode;stepToken:string|number;variant?:'hero'|'lesson'|'calendar'}){
  const {locale}=useLocale(),en=locale==='en',preferences=usePyPreferences(),reduced=useReducedMotion();
  const art=useRef<HTMLDivElement>(null),image=useRef<HTMLImageElement>(null),canvas=useRef<HTMLCanvasElement>(null),engine=useRef<PyRenderer|null>(null);
  const [inView,setInView]=useState(false),[loaded,setLoaded]=useState(false),[failed,setFailed]=useState(false),[renderer,setRenderer]=useState<'static'|'mesh'>('static');
@@ -37,7 +37,7 @@ export default function PyMascot({mode,stepToken,variant='lesson'}:{mode:PyMode;
  if(!preferences.visible)return null;
  return <aside className={`py-dock py-${variant}`} aria-label={en?'Py companion':'Спутник Py'}>
   <div className="py-art" role="img" aria-label={en?'Py, robot python':'Py, робот-питон'} ref={art} data-renderer={renderer} data-mode={mode} data-motion-running="false" onPointerMove={point} onPointerLeave={()=>engine.current?.setPointer(0,0)}>
-   <img ref={image} src={`${import.meta.env.BASE_URL}mascot/py.png`} alt="" width="1312" height="1200" loading="lazy" decoding="async" onLoad={()=>setLoaded(true)}/>
+   <img ref={image} src={`${import.meta.env.BASE_URL}mascot/py.png`} alt="" width="1309" height="1201" loading="lazy" decoding="async" onLoad={()=>setLoaded(true)}/>
    {(enabled&&!failed||renderer==='mesh')&&<canvas ref={canvas} aria-hidden="true"/>}
   </div>
   <div className="py-caption"><span>PY{variant==='hero'&&<> <span aria-hidden="true">/</span> {en?({idle:'READY',playing:'TRACING',paused:'PAUSED',complete:'RESULT'}[mode]):({idle:'ГОТОВ',playing:'РАЗБОР',paused:'ПАУЗА',complete:'ИТОГ'}[mode])}</>}</span><button onClick={()=>preferences.setVisible(false)} aria-label={en?'Hide Py':'Скрыть Py'} title={en?'Hide Py · restore in Appearance':'Скрыть Py · вернуть в оформлении'}>×</button></div>
