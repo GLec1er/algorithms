@@ -19,6 +19,7 @@ export async function checkAppearanceFocus(browser,base){
  }finally{await page.close();}
 }
 export async function checkDesignPolish(browser,base){
+ await checkBrandAlignment(browser,base);
  await checkAppearanceFocus(browser,base);
  const page=await browser.newPage({viewport:{width:1440,height:1000},colorScheme:'light',reducedMotion:'reduce'});
  try{
@@ -72,6 +73,21 @@ export async function checkDesignPolish(browser,base){
   await page.getByRole('searchbox').fill('heap');
   await expect(page.getByRole('heading',{name:'Heaps',exact:true})).toBeVisible();
   await page.unroute('**/lessons/insertion_index.json');
+ }finally{await page.close();}
+}
+
+async function checkBrandAlignment(browser,base){
+ const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+ try{
+  await page.goto(base+'?lang=en#/');
+  for(const width of [1024,1440,1920]){
+   await page.setViewportSize({width,height:1000});
+   const bounds=await page.locator('.rail-brand').evaluate(el=>{
+    const art=el.firstElementChild.getBoundingClientRect(),rail=el.closest('.studio-rail').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect();
+    return {dx:Math.abs((art.left+art.right-rail.left-rail.right)/2),dy:Math.abs((art.top+art.bottom-header.top-header.bottom)/2),inside:art.left>=rail.left&&art.right<=rail.right};
+   });
+   assert.ok(bounds.inside&&bounds.dx<=1&&bounds.dy<=1,`${width}px: brand artwork must be centered in the rail and aligned with the header: ${JSON.stringify(bounds)}`);
+  }
  }finally{await page.close();}
 }
 if(import.meta.url===new URL(process.argv[1],'file:').href){const browser=await chromium.launch({headless:true,...(process.env.CI?{}:{channel:'chrome'})});try{await checkDesignPolish(browser,process.env.LAB_URL||'http://127.0.0.1:4173/algorithms/');}finally{await browser.close();}}
