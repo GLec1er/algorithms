@@ -1,3 +1,4 @@
+import { t } from '../locale';
 import type { CSSProperties } from 'react';
 import { type Frame, type Value, pretty } from '../types';
 
@@ -12,9 +13,9 @@ export function ArrayRow({name, values, frame, pointers=false, halfOpen=false}:{
   const right=typeof frame.state.right==='number'?frame.state.right:undefined;
   const slots = Math.max(1,values.length + (entries.some(([,i])=>i===values.length)?1:0));
   return <div className="array-block">
-    <div className="data-label"><span>{name}</span><small>{values.length} {name==='s'?'симв.':'эл.'}</small></div>
+    <div className="data-label"><span>{name}</span><small>{values.length} {name==='s'?t("симв."):t("эл.")}</small></div>
     <div className="scene-scroll"><div className="array-track" style={{width:slots*58,height:pointers?148:100}}>
-      {!values.length && <span className="empty-data">∅ пусто</span>}
+      {!values.length && <span className="empty-data">{t("∅ пусто")}</span>}
       {values.map((v,i)=>{
         const outside=pointers && left!==undefined && right!==undefined && (i<left || (halfOpen?i>=right:i>right));
         return <div key={frame.arrays?.[name]?.[i] ?? i} className={`array-cell ${i===active?'active':''} ${outside?'outside':''}`} style={{transform:`translateX(${i*58}px)`}}>
@@ -46,7 +47,7 @@ export function Grid({name, value, frame, infection=false}:{name:string;value:Va
 
 export function Dictionary({name,value}:{name:string;value:Record<string,Value>}) {
   const entries=Object.entries(value);
-  return <div className="dictionary"><div className="data-label"><span>{name}</span><small>ключ → значение</small></div><div className="dictionary-items">{entries.length?entries.map(([k,v])=><div className="dict-entry" key={k}><code>{k}</code><span>→</span><strong>{pretty(v)}</strong></div>):<span className="empty-data">∅ пусто</span>}</div></div>;
+  return <div className="dictionary"><div className="data-label"><span>{name}</span><small>{t("ключ → значение")}</small></div><div className="dictionary-items">{entries.length?entries.map(([k,v])=><div className="dict-entry" key={k}><code>{k}</code><span>→</span><strong>{pretty(v)}</strong></div>):<span className="empty-data">{t("∅ пусто")}</span>}</div></div>;
 }
 
 export function ScalarScene({frame}:{frame:Frame}) {
@@ -55,9 +56,9 @@ export function ScalarScene({frame}:{frame:Frame}) {
 }
 
 function StackView({name,values,frame}:{name:string;values:Value[];frame:Frame}) {
-  return <div className="stack-block"><div className="data-label"><span>{name}</span><small>последним вошёл → первым вышел</small></div><div className="stack-well" style={{height:Math.max(70,values.length*38+30)}}>
-    {!values.length&&<span className="empty-data">∅ пустой стек</span>}
-    {values.map((value,i)=><div key={frame.arrays?.[name]?.[i]??i} className={`stack-item ${i===values.length-1?'top':''}`} style={{transform:`translateY(${(values.length-i-1)*38}px)`}}><code>{pretty(value)}</code>{i===values.length-1&&<span>← вершина</span>}</div>)}
+  return <div className="stack-block"><div className="data-label"><span>{name}</span><small>{t("последним вошёл → первым вышел")}</small></div><div className="stack-well" style={{height:Math.max(70,values.length*38+30)}}>
+    {!values.length&&<span className="empty-data">{t("∅ пустой стек")}</span>}
+    {values.map((value,i)=><div key={frame.arrays?.[name]?.[i]??i} className={`stack-item ${i===values.length-1?'top':''}`} style={{transform:`translateY(${(values.length-i-1)*38}px)`}}><code>{pretty(value)}</code>{i===values.length-1&&<span>{t("← вершина")}</span>}</div>)}
   </div></div>;
 }
 

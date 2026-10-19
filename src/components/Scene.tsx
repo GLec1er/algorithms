@@ -1,3 +1,4 @@
+import { t } from '../locale';
 import { type Frame, type Lesson, type Value, pretty } from '../types';
 import { ArrayRow, Auxiliary, Grid, ScalarScene, asArray, Dictionary, asObject } from './primitives';
 import { GraphScene, NodeScene } from './NodeScene';
@@ -9,7 +10,7 @@ function Intervals({frame,input,id}:{frame:Frame;input:Record<string,Value>;id:s
   const all=pairs.flatMap(pair=>pair.map(Number)),min=Math.min(0,...all),max=Math.max(1,...all);
   const x=(v:number)=>55+(v-min)/(max-min)*520;
   let row=0;
-  return <div className="scene-scroll"><svg className="interval-scene" viewBox={`0 0 640 ${Math.max(210,pairs.length*42+100)}`} role="img" aria-label="Интервалы на общей числовой оси">
+  return <div className="scene-scroll"><svg className="interval-scene" viewBox={`0 0 640 ${Math.max(210,pairs.length*42+100)}`} role="img" aria-label={t("Интервалы на общей числовой оси")}>
     <line className="axis" x1="50" y1="36" x2="590" y2="36"/>
     {Array.from({length:Math.min(max-min+1,11)},(_,i)=>{const v=min+i*(max-min)/Math.min(max-min,10);return <g key={i}><line className="tick" x1={x(v)} y1="32" x2={x(v)} y2="40"/><text x={x(v)} y="23" textAnchor="middle">{Number(v.toFixed(1))}</text></g>;})}
     {groups.flatMap(([name,rows])=>rows.map((pair,i)=>{const a=asArray(pair);const y=64+row++*42;const active=name==='result'||i===frame.state.i||i===frame.state.j;
@@ -21,10 +22,10 @@ function Intervals({frame,input,id}:{frame:Frame;input:Record<string,Value>;id:s
 
 function Heap({name,values}:{name:string;values:Value[]}) {
   const positions=values.map((_,i)=>{const level=Math.floor(Math.log2(i+1)),first=2**level-1;return {x:640*(i-first+0.5)/(2**level),y:45+level*65};});
-  return <div className="heap-block"><div className="data-label"><span>{name}</span><small>{name==='lower'?'max-heap · в коде −x':'min-heap'}</small></div><div className="scene-scroll"><svg viewBox={`0 0 640 ${Math.max(130,positions.at(-1)?.y??0)+35}`} className="heap-scene" role="img" aria-label={`Двоичная куча ${name}`}>
+  return <div className="heap-block"><div className="data-label"><span>{name}</span><small>{name==='lower'?t("max-heap · в коде −x"):'min-heap'}</small></div><div className="scene-scroll"><svg viewBox={`0 0 640 ${Math.max(130,positions.at(-1)?.y??0)+35}`} className="heap-scene" role="img" aria-label={t("Двоичная куча {0}",[name])}>
     {values.map((_,i)=>i>0?<line className="heap-edge" key={i} x1={positions[Math.floor((i-1)/2)].x} y1={positions[Math.floor((i-1)/2)].y} x2={positions[i].x} y2={positions[i].y}/>:null)}
     {values.map((v,i)=><g className={`node-group ${i===0?'focused':''}`} key={i} transform={`translate(${positions[i].x},${positions[i].y})`}><circle r="23"/><text className="node-value" textAnchor="middle" y="4">{pretty(name==='lower'&&typeof v==='number'?-v:Array.isArray(v)?v[0]:v)}</text></g>)}
-    {!values.length&&<text x="320" y="65" textAnchor="middle">∅ пустая куча</text>}
+    {!values.length&&<text x="320" y="65" textAnchor="middle">{t("∅ пустая куча")}</text>}
   </svg></div></div>;
 }
 
@@ -39,7 +40,7 @@ function Points({frame,input}:{frame:Frame;input:Record<string,Value>}) {
   const x=(n:number)=>55+(n-minX)/(maxX-minX)*510,y=(n:number)=>260-(n-minY)/(maxY-minY)*220;
   const visited=asArray(frame.state.visited);
   const current=Number(frame.state.current??frame.state.i??-1),next=Number(frame.state.j??(frame.state.current!==undefined?frame.state.i:-1));
-  return <div className="scene-scroll"><svg className="points-scene" viewBox="0 0 640 310" role="img" aria-label="Точки на координатной плоскости"><line className="axis" x1="40" y1={y(0)} x2="600" y2={y(0)}/><line className="axis" x1={x(0)} y1="20" x2={x(0)} y2="280"/>
+  return <div className="scene-scroll"><svg className="points-scene" viewBox="0 0 640 310" role="img" aria-label={t("Точки на координатной плоскости")}><line className="axis" x1="40" y1={y(0)} x2="600" y2={y(0)}/><line className="axis" x1={x(0)} y1="20" x2={x(0)} y2="280"/>
     {asArray(frame.state.chosen).map((edge,i)=>{const [a,b]=asArray(edge).map(Number);return points[a]&&points[b]?<line key={i} className="point-line chosen-edge" x1={x(Number(points[a][0]))} y1={y(Number(points[a][1]))} x2={x(Number(points[b][0]))} y2={y(Number(points[b][1]))}/>:null;})}
     {points[current]&&points[next]&&<line className="point-line" x1={x(Number(points[current][0]))} y1={y(Number(points[current][1]))} x2={x(Number(points[next][0]))} y2={y(Number(points[next][1]))}/>}
     {points.map((p,i)=><g className={`point ${i===current||i===next?'active':''} ${visited.includes(i)?'visited':''}`} key={i}><circle cx={x(Number(p[0]))} cy={y(Number(p[1]))} r="10"/><text x={x(Number(p[0]))+15} y={y(Number(p[1]))-10}>{pretty(p)}</text></g>)}
@@ -54,12 +55,12 @@ function Queens({frame,input}:{frame:Frame;input:Record<string,Value>}) {
 function Triangle({frame,input}:{frame:Frame;input:Record<string,Value>}) {
   const rows:number[][]=[[1]];
   for(let r=1;r<Math.min(Number(input.n),10);r++){const prev=rows[r-1];rows.push(Array.from({length:prev.length+2},(_,c)=>(prev[c-2]??0)+(prev[c-1]??0)+(prev[c]??0)));}
-  return <div className="triangle-scene"><div className="data-label"><span>Первые строки · наблюдение чётности</span><small>■ чётное</small></div><div className="scene-scroll">{rows.map((row,r)=><div className="triangle-row" key={r} style={{paddingLeft:(rows.length-r-1)*16}}><span>{r+1}</span>{row.map((v,c)=><div key={c} title={String(v)} className={`${v%2===0?'even':''} ${frame.done&&r+1===input.n&&c+1===frame.result?'answer':''}`}>{v%2}</div>)}</div>)}</div></div>;
+  return <div className="triangle-scene"><div className="data-label"><span>{t("Первые строки · наблюдение чётности")}</span><small>{t("■ чётное")}</small></div><div className="scene-scroll">{rows.map((row,r)=><div className="triangle-row" key={r} style={{paddingLeft:(rows.length-r-1)*16}}><span>{r+1}</span>{row.map((v,c)=><div key={c} title={String(v)} className={`${v%2===0?'even':''} ${frame.done&&r+1===input.n&&c+1===frame.result?'answer':''}`}>{v%2}</div>)}</div>)}</div></div>;
 }
 
 function Circle({frame,input}:{frame:Frame;input:Record<string,Value>}) {
   const size=Number(frame.state.size??1),survivor=Number(frame.state.survivor??0);
-  return <div className="scene-scroll"><svg className="circle-scene" viewBox="0 0 640 300" role="img" aria-label="Позиция выжившего в круге текущего размера"><text x="320" y="145" textAnchor="middle">размер {size}</text><text className="circle-note" x="320" y="167" textAnchor="middle">k = {pretty(input.k)} · индексы с 0</text>{Array.from({length:size},(_,i)=>{const angle=i*2*Math.PI/size-Math.PI/2;return <g key={i} className={`node-group ${i===survivor?'focused':''}`} transform={`translate(${320+Math.cos(angle)*120},${145+Math.sin(angle)*100})`}><circle r="23"/><text className="node-value" textAnchor="middle" y="5">{i}</text></g>;})}</svg></div>;
+  return <div className="scene-scroll"><svg className="circle-scene" viewBox="0 0 640 300" role="img" aria-label={t("Позиция выжившего в круге текущего размера")}><text x="320" y="145" textAnchor="middle">{t("размер")}{' '}{size}</text><text className="circle-note" x="320" y="167" textAnchor="middle">k = {pretty(input.k)}{' '}{t("· индексы с 0")}</text>{Array.from({length:size},(_,i)=>{const angle=i*2*Math.PI/size-Math.PI/2;return <g key={i} className={`node-group ${i===survivor?'focused':''}`} transform={`translate(${320+Math.cos(angle)*120},${145+Math.sin(angle)*100})`}><circle r="23"/><text className="node-value" textAnchor="middle" y="5">{i}</text></g>;})}</svg></div>;
 }
 
 export default function Scene({frame,lesson,input}:{frame:Frame;lesson:Lesson;input:Record<string,Value>}) {
@@ -84,9 +85,9 @@ export default function Scene({frame,lesson,input}:{frame:Frame;lesson:Lesson;in
   }
   return <div className={`scene scene-${lesson.scene}`}>
     {primary}
-    {frame.state.op&&<div className="operation"><span>Текущая операция</span><code>{pretty(frame.state.op)}</code></div>}
+    {frame.state.op&&<div className="operation"><span>{t("Текущая операция")}</span><code>{pretty(frame.state.op)}</code></div>}
     {lesson.scene==='hash'&&frame.state.seen&&!Array.isArray(frame.state.seen)&&<Dictionary name="seen" value={asObject(frame.state.seen)}/>}
     <Auxiliary frame={frame} exclude={[...excluded,...(lesson.scene==='intervals'?['result']:[]),...(lesson.scene==='hash'?['seen']:[])]}/>
-    {frame.calls.length>1&&<div className="call-stack"><span>Стек вызовов</span>{frame.calls.map((call,i)=><code key={i}>{call.name}<small>:{call.line}</small></code>)}</div>}
+    {frame.calls.length>1&&<div className="call-stack"><span>{t("Стек вызовов")}</span>{frame.calls.map((call,i)=><code key={i}>{call.name}<small>:{call.line}</small></code>)}</div>}
   </div>;
 }

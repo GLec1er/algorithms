@@ -1,3 +1,4 @@
+import { t } from '../locale';
 import { type Frame, type Value, type NodeState, isRef, pretty } from '../types';
 import { asArray, asObject } from './primitives';
 
@@ -8,7 +9,7 @@ function Drawing({nodes,edges,positions,frame,height=300}:{nodes:NodeState[];edg
   const width=Math.max(640,...[...positions.values()].map(p=>p.x+65));
   const labels=new Map<number,string[]>();
   for(const [key,v] of Object.entries(frame.state))if(isRef(v))labels.set(v.ref,[...(labels.get(v.ref)??[]),key]);
-  return <div className="scene-scroll"><svg className="node-scene" style={{minWidth:Math.min(width,900)}} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Узлы, связи и положение указателей">
+  return <div className="scene-scroll"><svg className="node-scene" style={{minWidth:Math.min(width,900)}} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={t("Узлы, связи и положение указателей")}>
     <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="currentColor"/></marker></defs>
     {edges.map((e,i)=>{
       const a=positions.get(e.from), b=positions.get(e.to);if(!a||!b)return null;
@@ -19,7 +20,7 @@ function Drawing({nodes,edges,positions,frame,height=300}:{nodes:NodeState[];edg
     })}
     {nodes.map(n=>{const p=positions.get(n.id);if(!p)return null;const names=labels.get(n.id)??[];
       return <g key={n.id} className={`node-group ${names.length?'focused':''} ${n.end?'terminal-node':''}`} style={{transform:`translate(${p.x}px,${p.y}px)`}}>
-        <circle r="26"/><text className="node-value" textAnchor="middle" y="5">{pretty(n.value).slice(0,12)}</text><text className="node-id" textAnchor="middle" y="-36">#{n.id}{n.end?' · конец слова':''}</text>
+        <circle r="26"/><text className="node-value" textAnchor="middle" y="5">{pretty(n.value).slice(0,12)}</text><text className="node-id" textAnchor="middle" y="-36">#{n.id}{n.end?t(" · конец слова"):''}</text>
         {names.length>0&&<text className="node-pointer" textAnchor="middle" y="49">{names.slice(0,3).join(' · ')}</text>}
       </g>;
     })}
@@ -28,7 +29,7 @@ function Drawing({nodes,edges,positions,frame,height=300}:{nodes:NodeState[];edg
 
 export function NodeScene({frame}:{frame:Frame}) {
   const nodes=frame.nodes;
-  if(!nodes.length)return <div className="scene-empty">Структура будет создана на следующих шагах.</div>;
+  if(!nodes.length)return <div className="scene-empty">{t("Структура будет создана на следующих шагах.")}</div>;
   const tree=nodes.some(n=>n.kind==='tree'||n.kind==='trie');
   const graph=nodes.some(n=>n.kind==='graph');
   const edges:Edge[]=[];
@@ -95,7 +96,7 @@ export function GraphScene({frame,input,id}:{frame:Frame;input:Record<string,Val
   }
   const current=frame.state.current??frame.state.start, visited=asArray(frame.state.visited),colors=asObject(frame.state.colors),dist=asArray(frame.state.dist);
   const positions=labels.map((_,i)=>({x:320+Math.cos(i*2*Math.PI/Math.max(1,labels.length)-Math.PI/2)*180,y:170+Math.sin(i*2*Math.PI/Math.max(1,labels.length)-Math.PI/2)*110}));
-  return <div className="scene-scroll"><svg className="node-scene graph-scene" viewBox="0 0 640 340" role="img" aria-label="Граф и состояние обхода">
+  return <div className="scene-scroll"><svg className="node-scene graph-scene" viewBox="0 0 640 340" role="img" aria-label={t("Граф и состояние обхода")}>
     <defs><marker id="graph-arrow" markerWidth="8" markerHeight="8" refX="27" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="currentColor"/></marker></defs>
     {edges.map((e,i)=>{const a=positions[e.from],b=positions[e.to];return a&&b?<g className="node-edge" key={i}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} markerEnd={['shortest_path','prerequisites','merge_communities'].includes(id)?'url(#graph-arrow)':undefined}/>{e.label&&<text x={(a.x+b.x)/2+8} y={(a.y+b.y)/2-6}>{e.label}</text>}</g>:null;})}
     {labels.map((label,i)=><g className={`node-group ${current===label?'focused':''} ${visited.includes(label)||colors[String(i)]!==undefined?'seen-node':''} ${colors[String(i)]===1?'alternate-node':''}`} transform={`translate(${positions[i].x},${positions[i].y})`} key={i}><circle r="27"/><text textAnchor="middle" y="5" className="node-value">{pretty(label)}</text>{dist[i]!==undefined&&<text textAnchor="middle" y="47" className="node-pointer">d = {pretty(dist[i])}</text>}</g>)}
