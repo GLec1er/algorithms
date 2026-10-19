@@ -2,7 +2,7 @@ def jump_end(a):
     farthest = 0
     for i, x in enumerate(a):
         if i > farthest:
-            return False  # Здесь начинается недостижимая область.
+            return False  # An unreachable region begins here.
         farthest = max(farthest, i + x)
         if farthest >= len(a) - 1:
             return True
@@ -15,7 +15,7 @@ def gas_stations(gas, cost):
         delta = gas[i] - cost[i]
         tank += delta
         total += delta
-        if tank < 0:  # Все старты от start до i тоже приводят к нехватке топлива.
+        if tank < 0:  # Every start from start through i also runs out of fuel.
             start = i + 1
             tank = 0
     return start if total >= 0 else -1
@@ -28,5 +28,5 @@ def candies(a):
             amounts[i] = amounts[i - 1] + 1
     for i in range(len(a) - 2, -1, -1):
         if a[i] > a[i + 1]:
-            amounts[i] = max(amounts[i], amounts[i + 1] + 1)  # Сохраняем оба ограничения одновременно.
+            amounts[i] = max(amounts[i], amounts[i + 1] + 1)  # Preserve both neighbor constraints simultaneously.
     return sum(amounts)

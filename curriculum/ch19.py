@@ -19,7 +19,7 @@ def spiral_traversal(grid):
             c = left
             for r in range(bottom, top - 1, -1):
                 result.append(grid[r][c])
-            left += 1  # Закончили кольцо, дальше остаётся только внутренняя часть.
+            left += 1  # The outer ring is finished; only the interior remains.
     return result
 
 
@@ -44,7 +44,7 @@ def collinear_points(points):
             divisor = gcd(dx, dy)
             dx, dy = dx // divisor, dy // divisor
             if dx < 0 or (dx == 0 and dy < 0):
-                dx, dy = -dx, -dy  # Одинаковые прямые имеют одинаковый нормализованный знак.
+                dx, dy = -dx, -dy  # The same line direction must have a consistent normalized sign.
             key = (dy, dx)
             slopes[key] = slopes.get(key, 0) + 1
             best = max(best, slopes[key] + 1)
@@ -54,12 +54,12 @@ def collinear_points(points):
 def josephus(n, k):
     survivor = 0
     for size in range(2, n + 1):
-        survivor = (survivor + k) % size  # Возвращаем индекс из меньшего круга в исходную нумерацию.
-    return survivor + 1  # Во входном условии люди нумеруются с 1.
+        survivor = (survivor + k) % size  # Map the smaller circle's survivor back to the original numbering.
+    return survivor + 1  # The problem numbers people starting at 1.
 
 
 def triangle_numbers(n):
-    remainder = n % 4  # Чётность первых четырёх позиций повторяется каждые четыре строки.
+    remainder = n % 4  # Parity in the first four positions repeats every four rows.
     if n % 2 == 1:
         return 2
     if remainder == 0:

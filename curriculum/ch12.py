@@ -35,7 +35,7 @@ def wildcard_words(words, patterns):
         x = word[i]
         if x != '.':
             return x in node.children and search(node.children[x], word, i + 1)
-        for child in node.children.values():  # Точка проверяет каждое возможное продолжение.
+        for child in node.children.values():  # A dot tries every possible next character.
             if search(child, word, i + 1):
                 return True
         return False
@@ -61,7 +61,7 @@ def board_words(grid, words):
             return
         x = grid[r][c]
         if x not in node.children:
-            return  # Ни одно слово не имеет такого префикса.
+            return  # No dictionary word has this prefix.
         node = node.children[x]
         path += x
         if node.end:

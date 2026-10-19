@@ -8,7 +8,7 @@ def sort_linked(a):
         while fast and fast.next:
             slow, fast = slow.next, fast.next.next
         right = slow.next
-        slow.next = None  # Разрываем список на две независимые половины.
+        slow.next = None  # Split the list into two independent halves.
         left, right = merge_sort(head), merge_sort(right)
         dummy = Node('∅')
         tail = dummy
@@ -40,7 +40,7 @@ def sort_array(a):
             else:
                 buffer[write] = a[j]
                 j += 1
-        a[left:right] = buffer[left:right]  # Объединённый диапазон теперь упорядочен.
+        a[left:right] = buffer[left:right]  # The merged interval is now sorted.
     merge(0, len(a))
     return a
 
@@ -55,7 +55,7 @@ def kth_largest(a, k):
             if a[i] <= pivot:
                 a[i], a[write] = a[write], a[i]
                 write += 1
-        a[write], a[right] = a[right], a[write]  # Опорный элемент занимает окончательное место.
+        a[write], a[right] = a[right], a[write]  # The pivot reaches its final position.
         if write == target:
             return a[write]
         if write < target:
@@ -73,7 +73,7 @@ def dutch_flag(a):
             i += 1
         elif a[i] == 2:
             a[i], a[high] = a[high], a[i]
-            high -= 1  # Пришедший справа элемент ещё не проверен: i не сдвигается.
+            high -= 1  # The value arriving from the right is unchecked: do not advance i.
         else:
             i += 1
     return a

@@ -1,11 +1,11 @@
 def insertion_index(a, target):
     left, right = 0, len(a)
-    while left < right:  # Диапазон полуоткрытый: [left, right).
+    while left < right:  # The candidate interval is half-open: [left, right).
         mid = (left + right) // 2
         if a[mid] < target:
-            left = mid + 1  # Все позиции до mid включительно слишком малы.
+            left = mid + 1  # Every position through mid is too small.
         else:
-            right = mid  # mid остаётся возможным ответом.
+            right = mid  # mid remains a possible answer.
     return left
 
 
@@ -28,12 +28,12 @@ def first_last(a, target):
 def cutting_wood(a, k):
     left, right = 0, max(a)
     while left < right:
-        mid = (left + right + 1) // 2  # Верхняя середина обеспечивает сдвиг при left=mid.
+        mid = (left + right + 1) // 2  # An upper midpoint ensures progress when assigning left = mid.
         wood = 0
         for i, height in enumerate(a):
             wood += max(0, height - mid)
         if wood >= k:
-            left = mid  # Древесины достаточно: пробуем более высокий срез.
+            left = mid  # There is enough wood: try a higher cut.
         else:
             right = mid - 1
     return left
@@ -45,7 +45,7 @@ def rotated_search(a, target):
         mid = (left + right) // 2
         if a[mid] == target:
             return mid
-        if a[left] <= a[mid]:  # Левая половина отсортирована.
+        if a[left] <= a[mid]:  # The left half is sorted.
             if a[left] <= target < a[mid]:
                 right = mid - 1
             else:
@@ -69,7 +69,7 @@ def median_arrays(a, b):
         ar = a[i] if i < len(a) else float('inf')
         bl = b[j - 1] if j else float('-inf')
         br = b[j] if j < len(b) else float('inf')
-        if al <= br and bl <= ar:  # Обе левые части целиком меньше правых.
+        if al <= br and bl <= ar:  # Every value in either left part is no greater than either right part.
             if (len(a) + len(b)) % 2:
                 return max(al, bl)
             return (max(al, bl) + min(ar, br)) / 2
@@ -86,7 +86,7 @@ def matrix_search(grid, target):
     left, right = 0, len(grid) * cols - 1
     while left <= right:
         mid = (left + right) // 2
-        r, c = divmod(mid, cols)  # Преобразуем плоский индекс обратно в клетку.
+        r, c = divmod(mid, cols)  # Convert the flat index back into a matrix cell.
         if grid[r][c] == target:
             return True
         if grid[r][c] < target:
@@ -100,7 +100,7 @@ def local_maxima(a):
     left, right = 0, len(a) - 1
     while left < right:
         mid = (left + right) // 2
-        if a[mid] < a[mid + 1]:  # Вправо есть подъём, значит там найдётся пик.
+        if a[mid] < a[mid + 1]:  # An uphill direction on the right guarantees a peak there.
             left = mid + 1
         else:
             right = mid
@@ -119,5 +119,5 @@ def weighted_selection(a, ticket):
         if prefix[mid] < ticket:
             left = mid + 1
         else:
-            right = mid  # Первый конец диапазона, покрывающий выбранный билет.
+            right = mid  # Find the first bucket endpoint covering the ticket.
     return left
