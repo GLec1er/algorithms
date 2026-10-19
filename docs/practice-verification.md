@@ -28,3 +28,9 @@ A storage fault test allowed reads but rejected writes. A second new task incorr
 Author review covered date/month/leap boundaries, undated legacy progress, repeated toggles, storage failures, cross-tab updates, prepared-example contracts and finite curriculum completion. No independent reviewer is claimed, following the user's restriction on unsolicited subagents.
 
 Progress remains local to this browser, with no account or server sync. Clearing browser storage removes it. The calendar tracks self-reported first completion, not automatically judged submissions. No reminders or external calendar events were created.
+
+## Design update · 2026-10-19
+
+The Focus / iOS bubble design is implemented locally with both themes, a modal catalogue, updated lesson/player/code/scenes, calendar and achievements. Progress computation, lesson data and deployment workflow are unchanged.
+
+`npm run check`, `npm run build` and the full browser suite passed against the production preview at port 4174. New checks cover theme persistence/system changes/storage denial, catalogue navigation/focus, five responsive widths in both themes, failure/retry with independent pattern explanation, and contrast for overlapping interval/graph/queen states. Full details: [bubble-design-verification.md](bubble-design-verification.md). Nothing has been published by this update.
