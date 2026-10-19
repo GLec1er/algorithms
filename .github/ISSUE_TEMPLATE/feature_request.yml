@@ -1,0 +1,17 @@
+name: Improvement idea
+description: Suggest a concrete improvement to learning or using Algorithms Lab.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is difficult today?
+      description: Describe the learning or usage situation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Explain the resulting behavior and any simpler alternatives.
+    validations:
+      required: true
