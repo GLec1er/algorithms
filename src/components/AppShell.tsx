@@ -24,7 +24,7 @@ export default function AppShell({ activeRoute, catalog, children, completedCoun
   }
   return <div className="app-shell studio-shell">
     <aside className="studio-rail" aria-label={t('Разделы приложения')}>
-      <a className="rail-brand" href="#/" aria-label="Algorithms Lab"><span>[<i/>]</span></a>
+      <a className="rail-brand" href="#/" aria-label="Algorithms Lab"><svg width="42" height="42" viewBox="0 0 42 42" fill="none" stroke="currentColor" aria-hidden="true"><path d="M13 6H7v30h6m16-30h6v30h-6" strokeWidth="3"/><circle cx="21" cy="21" r="2.5" strokeWidth="1"/></svg></a>
       <nav aria-label={t('Разделы приложения')}>
         <a href="#/" aria-label={t('На главную')} title={t('На главную')} aria-current={activeRoute==='home'?'page':undefined}><Icon name="home"/></a>
         <button onClick={open} aria-label={t('Открыть каталог')} title={t('Каталог')} aria-haspopup="dialog" aria-expanded={opened} aria-controls="lesson-catalog"><Icon name="library"/></button>
