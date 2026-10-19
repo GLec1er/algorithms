@@ -4,6 +4,7 @@ import { useTheme } from '../useTheme';
 import ThemeToggle from './ThemeToggle';
 import {LanguageToggle} from '../i18n';
 import Icon from './Icon';
+import BrandMark from './BrandMark';
 
 export default function AppShell({ activeRoute, catalog, children, completedCount, lessonCount }: {
   activeRoute: string; catalog: ReactNode; children: ReactNode; completedCount: number; lessonCount: number;
@@ -24,7 +25,7 @@ export default function AppShell({ activeRoute, catalog, children, completedCoun
   }
   return <div className="app-shell studio-shell">
     <aside className="studio-rail" aria-label={t('Разделы приложения')}>
-      <a className="rail-brand" href="#/" aria-label="Algorithms Lab"><svg width="42" height="42" viewBox="0 0 42 42" fill="none" stroke="currentColor" aria-hidden="true"><path d="M13 6H7v30h6m16-30h6v30h-6" strokeWidth="3"/><circle cx="21" cy="21" r="2.5" strokeWidth="1"/></svg></a>
+      <a className="rail-brand" href="#/" aria-label="Algorithms Lab"><BrandMark/></a>
       <nav aria-label={t('Разделы приложения')}>
         <a href="#/" aria-label={t('На главную')} title={t('На главную')} aria-current={activeRoute==='home'?'page':undefined}><Icon name="home"/></a>
         <button onClick={open} aria-label={t('Открыть каталог')} title={t('Каталог')} aria-haspopup="dialog" aria-expanded={opened} aria-controls="lesson-catalog"><Icon name="library"/></button>
@@ -35,7 +36,7 @@ export default function AppShell({ activeRoute, catalog, children, completedCoun
     </aside>
     <header className="topbar">
       <a className="brand" href="#/" aria-label="Algorithms Lab">
-        <span className="brand-mark"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="m14 11-8 9 8 9m12-18 8 9-8 9M22 8l-4 24"/></svg></span>
+        <span className="brand-mark"><BrandMark/></span>
         <span className="brand-word">Algorithms <b>Lab</b><small>CODING INTERVIEW PATTERNS</small></span>
       </a>
       <button className="catalog-trigger" onClick={open} aria-label={t("Открыть каталог")} aria-haspopup="dialog" aria-expanded={opened} aria-controls="lesson-catalog"><Icon name="menu"/><span>{t("Каталог")}</span></button>
