@@ -1,0 +1,11 @@
+# Technical studio and Py
+
+Approved direction: the technical studio browser concept with the robot python Py, including its 2.5D motion study. English first, complete optional Russian. References: https://labs.chaingpt.org/ and https://app.chaingpt.org/; reuse principles, not their assets.
+
+Use a continuous thin grid, a compact desktop navigation rail, restrained ivory/graphite surfaces with amber actions, and a header with integrated EN/RU and Appearance controls. Keep normal readable type in lessons. Home leads with “Understand the next move.”, a real prepared binary-search trace, 101 problems and 19 patterns, followed by the searchable pattern library. Keep the primary lesson link, resume, calendar, sharing and backup features. On phones keep the demo controls and useful algorithm state reachable in the first screen.
+
+Py is the original coiled robot-python render approved in this chat: ivory armor, graphite joints, amber eyes. It has a reserved stage near the home demo and a small dock in the lesson; it must not overlay data, code, or controls. Motion is a 2.5D deformable image mesh with independent head, neck, coil and tail timing; it is not an articulated 3D model. No new runtime library is needed. Idle moves gently; playback and manual steps cause small damped responses; pause settles; a terminal example causes one result gesture and becomes still. A result never marks a lesson complete or awards study credit.
+
+Animate only while visible, the tab is active, the user allows motion, and the OS does not request reduced motion. Load the renderer lazily, cap resolution, stop drawing a settled pose, and keep a static image if WebGL is unavailable or lost. Dispose resources on navigation. Allow users to pause motion or hide Py, persist preferences safely, and restore Py from Appearance. Preferences must work when storage is denied.
+
+Maintain all 101 lessons, 404 checked examples, 19 pattern guides, actual trace states, two-language behavior, local progress, exports and imports. Verify keyboard focus, native radio behavior, popover dismissal, both themes, reduced motion, unavailable graphics, route changes, and widths 320, 390, 768, 1024 and 1440px. No deployment or PR merge is included; deliver a reviewable PR.

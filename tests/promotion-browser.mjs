@@ -7,7 +7,7 @@ export async function checkPromotion(browser,url=base){
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.clock.setFixedTime('2026-10-19T12:00:00Z');
  await page.goto(url);
- await page.getByRole('heading',{name:'Coding interview patterns in Python.',exact:true}).waitFor({timeout:5000});
+ await page.getByRole('heading',{name:'Understand the next move.',exact:true}).waitFor({timeout:5000});
  assert.equal(await page.locator('html').getAttribute('lang'),'en');
  await page.getByRole('link',{name:'Try binary search',exact:true}).click();
  await page.getByLabel('Animation step', {exact:true}).fill('4');

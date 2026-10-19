@@ -11,6 +11,7 @@ Explore **101 Python interview problems** through step-by-step execution visuali
 - **See what every line changes.** Arrays, pointers, linked nodes, trees, graphs, heaps, DP tables, a call stack and local variables stay connected to the displayed Python.
 - **Learn the reasoning.** Each pattern includes recognition signals, an invariant, a worked example, comparisons and common mistakes.
 - **Build a practice habit.** Track understood problems, weekday goals, XP and streaks locally. Export a JSON backup to keep or transfer your history.
+- **Make the workspace yours.** Choose light, dark or system appearance. Py, an optional robot-python companion, reacts to the trace; pause its motion or hide it from Appearance. Reduced motion is respected. [How Py works](docs/mascot.md).
 
 No account or server required. No analytics. MIT licensed.
 

@@ -1,6 +1,6 @@
 import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
-import {selectTheme} from './ui-controls.mjs';
+import {selectTheme,openAppearance} from './ui-controls.mjs';
 import { pathToFileURL } from 'node:url';
 
 // Catches lost theme selection, missing OS updates, progress writes and storage-denial crashes.
@@ -18,7 +18,9 @@ export async function checkDesign(browser, base) {
     assert.notEqual(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),light);
     assert.equal(await page.evaluate(()=>localStorage.getItem('patterns-study-v2')),progress);
     await page.reload();
+    await openAppearance(page);
     await expect(page.getByRole('group',{name:'Оформление',exact:true}).getByRole('radio',{name:'Тёмная',exact:true})).toBeChecked();
+    await page.keyboard.press('Escape');
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
     await selectTheme(page,'system');
     await page.emulateMedia({colorScheme:'dark'});

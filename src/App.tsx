@@ -13,6 +13,7 @@ import PatternGuide from './components/PatternGuide';
 import PracticeCalendar from './components/PracticeCalendar';
 import AppShell from './components/AppShell';
 import Icon from './components/Icon';
+import PyMascot from './components/py/PyMascot';
 import { localDay, parseProgress, practiceStats, toggleLesson, type StudyProgress } from './progress';
 
 const levels:Record<string,string>={Easy:'Легко',Medium:'Средне',Hard:'Сложно'};
@@ -58,7 +59,7 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
     <div className="problem-brief"><span className="brief-label">{t("УСЛОВИЕ")}<span>↳</span></span><p className="statement">{lesson.statement}</p></div>
     {error?<div className="error-card" role="alert"><p>{t(error)}</p><button onClick={()=>location.reload()}>{t("Повторить загрузку")}</button></div>:!payload||!frame||!example?<div className="loading-card"><span className="loading-spinner"/>{t("Готовим визуализацию…")}</div>:<>
       <div className="workspace-grid">
-        <section className="visual-panel" aria-label={t("Визуализация алгоритма")}><header className="panel-heading"><div><span className="panel-number">01</span><strong>{t("Визуализация")}</strong></div><span className={`play-status ${playing?'playing':''}`}><i/>{frame.done?t("Завершено"):playing?t("В движении"):t("На паузе")}</span></header>
+        <section className="visual-panel" aria-label={t("Визуализация алгоритма")}><header className="panel-heading"><div><span className="panel-number">01</span><strong>{t("Визуализация")}</strong></div><div className="panel-companion"><span className={`play-status ${playing?'playing':''}`}><i/>{frame.done?t("Завершено"):playing?t("В движении"):t("На паузе")}</span><PyMascot mode={frame.done?'complete':playing?'playing':'paused'} stepToken={`${exampleIndex}/${step}`}/></div></header>
           <div className="example-toolbar"><label>{t("Пример")}<select aria-label={t("Пример")} value={exampleIndex} onChange={e=>{setPlaying(false);setStep(0);setExampleIndex(Number(e.target.value));}}>{payload.examples.map((ex,i)=><option key={i} value={i}>{locale==='en'?ex.labelEn:ex.label}</option>)}</select></label><div className="input-chips">{Object.entries(example.args).filter(([,v])=>!Array.isArray(v)&&typeof v!=='object').slice(0,3).map(([k,v])=><span key={k}><code>{k}</code> = <strong>{pretty(v)}</strong></span>)}</div></div>
           <div className="canvas"><Scene frame={frame} lesson={lesson} input={example.args}/></div>
           <div className="legend"><span><i className="legend-active"/>{t("Текущий элемент")}</span><span><i className="legend-range"/>{t("Рабочая область")}</span><span><i className="legend-muted"/>{t("Вне поиска")}</span></div>

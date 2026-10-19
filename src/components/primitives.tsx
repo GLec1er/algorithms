@@ -14,17 +14,17 @@ export function ArrayRow({name, values, frame, pointers=false, halfOpen=false}:{
   const slots = Math.max(1,values.length + (entries.some(([,i])=>i===values.length)?1:0));
   return <div className="array-block">
     <div className="data-label"><span>{name}</span><small>{values.length} {name==='s'?t("симв."):t("эл.")}</small></div>
-    <div className="scene-scroll"><div className="array-track" style={{width:slots*58,height:pointers?148:100}}>
+    <div className="scene-scroll"><div className="array-track" style={{width:`calc(var(--array-slot, 58px) * ${slots})`,height:pointers?148:100}}>
       {!values.length && <span className="empty-data">{t("∅ пусто")}</span>}
       {values.map((v,i)=>{
         const outside=pointers && left!==undefined && right!==undefined && (i<left || (halfOpen?i>=right:i>right));
-        return <div key={frame.arrays?.[name]?.[i] ?? i} className={`array-cell ${i===active?'active':''} ${outside?'outside':''}`} style={{transform:`translateX(${i*58}px)`}}>
+        return <div key={frame.arrays?.[name]?.[i] ?? i} className={`array-cell ${i===active?'active':''} ${outside?'outside':''}`} style={{transform:`translateX(calc(var(--array-slot, 58px) * ${i}))`}}>
           <span className="cell-index">{i}</span><span className="cell-value">{pretty(v)}</span>
         </div>;
       })}
       {entries.map(([n,i])=>{
         const same=entries.filter(([,j])=>j===i).findIndex(([m])=>m===n);
-        return <div key={n} className={`array-pointer pointer-${n}`} style={{transform:`translateX(${i*58}px)`,top:88+same*24}}>{n}<span>↑</span></div>;
+        return <div key={n} className={`array-pointer pointer-${n}`} style={{transform:`translateX(calc(var(--array-slot, 58px) * ${i}))`,top:88+same*24}}>{n}<span>↑</span></div>;
       })}
     </div></div>
   </div>;
