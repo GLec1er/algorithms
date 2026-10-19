@@ -6,6 +6,7 @@ import {checkPromotion,checkEnglishCurriculum} from './promotion-browser.mjs';
 import {checkDesignPolish} from './design-polish-browser.mjs';
 import { checkDesign } from './design-browser.mjs';
 import {checkPy} from './py-browser.mjs';
+import {checkPyClarity} from './py-clarity-browser.mjs';
 
 const base = process.env.LAB_URL || 'http://127.0.0.1:4173/algorithms/';
 const russianBase=base+'?lang=ru';
@@ -15,6 +16,7 @@ const errors=[];
 page.on('pageerror', error=>errors.push(error.message));
 try {
   fs.mkdirSync('test-results',{recursive:true});
+  await checkPyClarity(browser,base);
   await checkPy(browser,base);
   await checkDesignPolish(browser,base);
   await checkPromotion(browser,base);

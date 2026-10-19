@@ -25,13 +25,15 @@ void main(){
  gl_Position=vec4(p.x*2.0-1.0,1.0-p.y*2.0,0.0,1.0);
  v_uv=a_uv;
 }`;
-const fragment=`precision mediump float;varying vec2 v_uv;uniform sampler2D u_image;void main(){gl_FragColor=texture2D(u_image,v_uv);}`;
+const fragment=`precision highp float;varying vec2 v_uv;uniform sampler2D u_image;void main(){gl_FragColor=texture2D(u_image,v_uv);}`;
 
 export class PyRenderer{
  private gl:WebGLRenderingContext|null=null;
  private program:WebGLProgram|null=null;
  private buffer:WebGLBuffer|null=null;
  private texture:WebGLTexture|null=null;
+ private image:HTMLImageElement|null=null;
+ private textureWidth=0;private textureHeight=0;
  private motionUniform:WebGLUniformLocation|null=null;
  private gestureUniform:WebGLUniformLocation|null=null;
  private resize:ResizeObserver|null=null;
@@ -46,7 +48,7 @@ export class PyRenderer{
  constructor(private canvas:HTMLCanvasElement,private host:HTMLElement,private onFailure:()=>void){}
 
  initialize(image:HTMLImageElement){
-  const gl=this.canvas.getContext('webgl',{alpha:true,premultipliedAlpha:false,antialias:false,powerPreference:'low-power'});
+  const gl=this.canvas.getContext('webgl',{alpha:true,premultipliedAlpha:true,antialias:false,powerPreference:'low-power'});
   if(!gl)throw new Error('WebGL unavailable');
   this.gl=gl;
   const shaders:WebGLShader[]=[];
@@ -74,20 +76,35 @@ export class PyRenderer{
   gl.bindTexture(gl.TEXTURE_2D,this.texture);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);
+  this.image=image;
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
   this.motionUniform=gl.getUniformLocation(this.program,'u_motion');this.gestureUniform=gl.getUniformLocation(this.program,'u_gesture');
   gl.uniform1i(gl.getUniformLocation(this.program,'u_image'),0);gl.disable(gl.BLEND);gl.clearColor(0,0,0,0);
   this.canvas.addEventListener('webglcontextlost',this.contextLost);
   document.addEventListener('visibilitychange',this.visibilityChanged);
-  this.resize=new ResizeObserver(()=>{this.size();this.wake();});this.resize.observe(this.host);
+  this.resize=new ResizeObserver(this.resized);this.resize.observe(this.host);window.addEventListener('resize',this.resized);
   this.size();this.draw();
  }
  private size(){
   if(!this.gl||this.disposed)return;
-  const r=this.host.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.5);
+  // A little supersampling preserves the narrow armor seams during deformation.
+  const r=this.host.getBoundingClientRect(),dpr=Math.min(Math.max((devicePixelRatio||1)*1.5,2),4);
   this.canvas.width=Math.max(1,Math.round(r.width*dpr));this.canvas.height=Math.max(1,Math.round(r.height*dpr));
   this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
+  // Prefilter once to the physical size of the visible pose. Sampling the full
+  // source with LINEAR aliases fine details; blending mip levels softens them.
+  // Only resize rebuilds this texture. Animation stays entirely on the GPU.
+  const width=Math.max(1,Math.round(this.canvas.width*.91)),height=Math.max(1,Math.round(this.canvas.height*.91));
+  if(this.image&&(width!==this.textureWidth||height!==this.textureHeight)){
+   const source=document.createElement('canvas');source.width=width;source.height=height;
+   const context=source.getContext('2d');if(!context)throw new Error('Texture preparation unavailable');
+   context.imageSmoothingQuality='high';context.drawImage(this.image,0,0,width,height);
+   this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture);
+   this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA,this.gl.RGBA,this.gl.UNSIGNED_BYTE,source);
+   this.textureWidth=width;this.textureHeight=height;
+  }
  }
+ private resized=()=>{this.size();this.wake();};
  setMode(mode:PyMode){
   const changed=mode!==this.mode;this.mode=mode;
   if(mode==='paused'){this.targetX=0;this.targetY=0;}
@@ -131,7 +148,7 @@ export class PyRenderer{
  }
  dispose(){
   if(this.disposed)return;this.disposed=true;cancelAnimationFrame(this.raf);this.raf=0;
-  this.resize?.disconnect();this.canvas.removeEventListener('webglcontextlost',this.contextLost);document.removeEventListener('visibilitychange',this.visibilityChanged);
+  this.resize?.disconnect();window.removeEventListener('resize',this.resized);this.canvas.removeEventListener('webglcontextlost',this.contextLost);document.removeEventListener('visibilitychange',this.visibilityChanged);
   if(this.gl){this.gl.deleteTexture(this.texture);this.gl.deleteBuffer(this.buffer);this.gl.deleteProgram(this.program);if(!this.gl.isContextLost())this.gl.getExtension('WEBGL_lose_context')?.loseContext();}
   this.host.dataset.motionRunning='false';
  }

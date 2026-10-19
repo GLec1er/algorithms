@@ -1,3 +1,4 @@
+import PyMascot from './py/PyMascot';
 import ProgressBackup from './ProgressBackup';
 import { t, getCurrentLocale } from '../locale';
 import { useMemo, useState } from 'react';
@@ -20,7 +21,7 @@ export default function PracticeCalendar({progress,today,lessons,chapters,storag
   const closed=stats.todayCount>0;
   return <article className="practice-content">
     <div className="breadcrumb"><a href="#/problem/insertion_index">{t("Практикум")}</a><span>/</span><span>{t("Календарь")}</span></div>
-    <div className="practice-heading"><span className="practice-emblem" aria-hidden="true">✓</span><div><div className="eyebrow">{t("МАЛЕНЬКИЙ ШАГ КАЖДЫЙ БУДНИЙ ДЕНЬ")}</div><h1>{t("Календарь практики")}</h1><p>{t("Понедельник — пятница: хотя бы одна новая задача. Выходные — по желанию.")}</p></div></div>
+    <div className="companion-intro practice-intro"><div className="practice-heading"><div><div className="eyebrow">{t("МАЛЕНЬКИЙ ШАГ КАЖДЫЙ БУДНИЙ ДЕНЬ")}</div><h1>{t("Календарь практики")}</h1><p>{t("Понедельник — пятница: хотя бы одна новая задача. Выходные — по желанию.")}</p></div></div><PyMascot variant="calendar" mode={closed?'complete':'idle'} stepToken={`${today}/${closed}`}/></div>
     {!storageAvailable&&<p className="storage-notice" role="alert">{t("Хранилище браузера недоступно. Прогресс работает в этой вкладке, но после перезагрузки может исчезнуть.")}</p>}
     <section className={`daily-goal ${closed?'goal-done':''}`}>
       <span className="goal-symbol" aria-hidden="true">{closed?'✓':stats.finished?'✦':status==='weekend'?'☀':'○'}</span>
