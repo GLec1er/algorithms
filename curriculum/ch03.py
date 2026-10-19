@@ -2,7 +2,7 @@ def linked_reversal(a):
     from curriculum.structures import linked, list_values
     current, prev = linked(a), None
     while current:
-        following = current.next  # Сохраняем путь к ещё не обработанной части.
+        following = current.next  # Preserve the path to the unprocessed suffix.
         current.next = prev
         prev = current
         current = following
@@ -18,7 +18,7 @@ def remove_kth(a, k):
         fast = fast.next
     while fast.next:
         slow, fast = slow.next, fast.next
-    slow.next = slow.next.next  # slow находится перед удаляемым узлом.
+    slow.next = slow.next.next  # The slow pointer is immediately before the node to remove.
     return list_values(dummy.next)
 
 
@@ -36,7 +36,7 @@ def linked_intersection(a, b, tail):
         return head
     head_a, head_b = attach(a), attach(b)
     left, right = head_a, head_b
-    while left is not right:  # Сравниваем идентичность узлов, а не их значения.
+    while left is not right:  # Compare node identity, not node values.
         left = left.next if left else head_b
         right = right.next if right else head_a
     return left.value if left else None
@@ -63,7 +63,7 @@ def lru_cache(capacity, ops):
             node = cache[key]
             result.append(node.value[1])
             unlink(node)
-            append(node)  # Недавно использованный узел перемещается в конец.
+            append(node)  # Move the recently used node to the end.
         elif capacity:
             if key in cache:
                 node = cache[key]
@@ -97,7 +97,7 @@ def palindromic_list(a):
             valid = False
         left, right = left.next, right.next
     current, prev = prev, None
-    while current:  # Восстанавливаем вторую половину даже после несовпадения.
+    while current:  # Restore the second half even after a mismatch.
         following = current.next
         current.next = prev
         prev, current = current, following
@@ -114,7 +114,7 @@ def flatten_list(a):
         if current.next:
             stack.append(current.next)
         if current.child:
-            stack.append(current.child)  # Дочерний уровень обрабатывается раньше следующего соседа.
+            stack.append(current.child)  # Process the child chain before the next sibling.
         if prev:
             prev.next, current.prev = current, prev
         current.child = None

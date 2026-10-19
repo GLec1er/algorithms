@@ -6,7 +6,7 @@ def graph_copy(adj):
     copies = {}
     def clone(node):
         if node.id in copies:
-            return copies[node.id]  # Этот узел уже создан: сохраняем ссылочную идентичность.
+            return copies[node.id]  # This node was already cloned: preserve reference identity.
         copy = Node(node.value, 'graph')
         copies[node.id] = copy
         for neighbor in node.neighbors:
@@ -34,7 +34,7 @@ def count_islands(grid):
         for c in range(cols):
             if grid[r][c] == 1 and (r,c) not in visited:
                 count += 1
-                visit(r,c)  # Этот обход пометит ровно одну компоненту суши.
+                visit(r,c)  # This traversal marks exactly one land component.
     return count
 
 
@@ -57,7 +57,7 @@ def matrix_infection(grid):
                     grid[nr][nc] = 2
                     healthy -= 1
                     queue.append((nr,nc))
-        minutes += 1  # Завершили одну волну распространения.
+        minutes += 1  # One propagation wave has finished.
     return minutes if healthy == 0 else -1
 
 
@@ -76,7 +76,7 @@ def bipartite(adj):
                     colors[neighbor] = 1 - colors[current]
                     queue.append(neighbor)
                 elif colors[neighbor] == colors[current]:
-                    return False  # Ребро связывает одинаковые цвета.
+                    return False  # An edge connects vertices of the same color.
     return True
 
 
@@ -90,7 +90,7 @@ def increasing_path(grid):
             nr, nc = r + dr, c + dc
             if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]) and grid[nr][nc] > grid[r][c]:
                 best = max(best, 1 + visit(nr,nc))
-        memo[(r,c)] = best  # Ответ для клетки вычисляется только один раз.
+        memo[(r,c)] = best  # Compute each cell's best answer only once.
         return best
     result = 0
     for r in range(len(grid)):
@@ -116,7 +116,7 @@ def word_transform(start, end, words):
                 continue
             differences = sum(a != b for a, b in zip(current, word))
             if len(word) == len(current) and differences == 1:
-                remaining.remove(word)  # Первое посещение в BFS имеет минимальную длину.
+                remaining.remove(word)  # The first BFS visit has the shortest length.
                 queue.append((word, distance + 1))
     return 0
 
@@ -125,7 +125,7 @@ def merge_communities(n, ops):
     parent, sizes, result = list(range(n)), [1] * n, []
     def find(current):
         while parent[current] != current:
-            parent[current] = parent[parent[current]]  # Сжатие пути через дедушку.
+            parent[current] = parent[parent[current]]  # Compress the path through the grandparent.
             current = parent[current]
         return current
     for op in ops:
@@ -158,7 +158,7 @@ def prerequisites(n, edges):
             indegree[neighbor] -= 1
             if indegree[neighbor] == 0:
                 queue.append(neighbor)
-    return len(visited) == n  # Невзятые вершины означают цикл зависимостей.
+    return len(visited) == n  # Unprocessed vertices imply a dependency cycle.
 
 
 def shortest_path(n, edges, start):
@@ -172,7 +172,7 @@ def shortest_path(n, edges, start):
     while heap:
         distance, current = heapq.heappop(heap)
         if distance != dist[current]:
-            continue  # В куче мог остаться устаревший, более длинный путь.
+            continue  # The heap may retain an obsolete, longer path.
         for neighbor, weight in adj[current]:
             candidate = distance + weight
             if candidate < dist[neighbor]:
@@ -191,11 +191,11 @@ def connect_dots(points):
         visited.add(current)
         result += dist[current]
         if parent[current] is not None:
-            chosen.append([parent[current], current])  # Это ребро стало частью минимального остова.
+            chosen.append([parent[current], current])  # This edge joins the minimum spanning tree.
         for i, point in enumerate(points):
             if i not in visited:
                 weight = abs(points[current][0] - point[0]) + abs(points[current][1] - point[1])
                 if weight < dist[i]:
-                    dist[i] = weight  # Лучшее ребро из уже соединённой части к точке i.
+                    dist[i] = weight  # The best edge from the connected component to point i.
                     parent[i] = current
     return result

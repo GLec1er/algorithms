@@ -2,7 +2,7 @@ def permutations(a):
     result, path, used = [], [], set()
     def visit():
         if len(path) == len(a):
-            result.append(path.copy())  # Снимок пути не изменится при последующих откатах.
+            result.append(path.copy())  # Copy the path so later undo operations cannot change this answer.
             return
         for i, x in enumerate(a):
             if i in used:
@@ -10,7 +10,7 @@ def permutations(a):
             used.add(i)
             path.append(x)
             visit()
-            path.pop()  # Отменяем выбор перед следующей ветвью.
+            path.pop()  # Undo the choice before exploring the next branch.
             used.remove(i)
     visit()
     return result
@@ -22,9 +22,9 @@ def subsets(a):
         if i == len(a):
             result.append(path.copy())
             return
-        visit(i + 1)  # Ветвь без текущего элемента.
+        visit(i + 1)  # Explore without the current element.
         path.append(a[i])
-        visit(i + 1)  # Ветвь с текущим элементом.
+        visit(i + 1)  # Explore with the current element.
         path.pop()
     visit(0)
     return result
@@ -39,13 +39,13 @@ def n_queens(n):
             return
         for c in range(n):
             if c in columns or r + c in rising or r - c in falling:
-                continue  # Столбец или диагональ уже заняты.
+                continue  # The column or diagonal is already occupied.
             placement.append(c)
             columns.add(c)
             rising.add(r + c)
             falling.add(r - c)
             visit(r + 1)
-            placement.pop()  # Полностью восстанавливаем ограничения строки.
+            placement.pop()  # Restore every constraint for this row.
             columns.remove(c)
             rising.remove(r + c)
             falling.remove(r - c)
@@ -62,9 +62,9 @@ def combinations_sum(a, target):
             return
         for i in range(start, len(a)):
             if a[i] > remaining:
-                break  # Следующие значения ещё больше и тоже не подходят.
+                break  # Later sorted values are even larger and cannot fit either.
             path.append(a[i])
-            visit(i, remaining - a[i])  # Повтор разрешён, поэтому индекс остаётся i.
+            visit(i, remaining - a[i])  # Reuse is allowed, so the next start index remains i.
             path.pop()
     visit(0, target)
     return result
@@ -80,7 +80,7 @@ def phone_combinations(digits):
         for x in keys[digits[i]]:
             path.append(x)
             visit(i + 1)
-            path.pop()  # Пробуем следующую букву той же цифры.
+            path.pop()  # Try the next letter for the same digit.
     if digits:
         visit(0)
     return result
