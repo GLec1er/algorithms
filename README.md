@@ -1,6 +1,6 @@
 # Algorithms Lab
 
-**Understand the pattern. Watch the code.**
+**Step through coding interview patterns in Python.**
 
 Explore **101 Python interview problems** through step-by-step execution visualizations, **19 pattern guides** and **404 verified examples**. English by default, with a complete Russian option.
 

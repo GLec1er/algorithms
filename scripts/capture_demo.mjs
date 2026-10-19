@@ -6,8 +6,10 @@ const browser=await chromium.launch({headless:true,...(process.env.CI?{}:{channe
 try{
  await fs.mkdir('docs/media',{recursive:true});await fs.mkdir('test-results/demo-frames',{recursive:true});
  const page=await browser.newPage({viewport:{width:1200,height:800},colorScheme:'dark',reducedMotion:'reduce'});
- await page.goto(base+'?lang=en#/');await page.locator('main h1').waitFor();
+ await page.goto(base+'?lang=en#/');await page.locator('main h1').waitFor();await page.getByTestId('demo-step').waitFor();
+ for(let i=0;i<3;i++)await page.getByRole('button',{name:'Next demo step',exact:true}).click();
  await page.screenshot({path:'docs/media/home.png'});
+ await page.emulateMedia({colorScheme:'light'});await page.screenshot({path:'test-results/home-light.png'});await page.emulateMedia({colorScheme:'dark'});
  await page.goto(base+'?lang=en#/problem/insertion_index');await page.getByLabel('Animation step',{exact:true}).waitFor();
  const top=await page.locator('.workspace-grid').evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
  await page.evaluate(y=>window.scrollTo(0,y-110),top);
@@ -21,7 +23,7 @@ try{
  await page.setViewportSize({width:1200,height:630});
  await page.screenshot({path:'public/social-preview.png'});
  for(const locale of ['en','ru']){
-  await page.setViewportSize({width:390,height:844});await page.goto(base+'?lang='+locale+'#/');await page.locator('main h1').waitFor();await page.screenshot({path:`test-results/home-mobile-${locale}.png`,fullPage:true});
+  await page.setViewportSize({width:390,height:844});await page.goto(base+'?lang='+locale+'#/');await page.locator('main h1').waitFor();await page.getByTestId('demo-step').waitFor();await page.screenshot({path:`test-results/home-mobile-${locale}.png`,fullPage:true});
   await page.goto(base+'?lang='+locale+'#/calendar');await page.locator('main h1').waitFor();await page.screenshot({path:`test-results/calendar-mobile-${locale}.png`,fullPage:true});
  }
  console.log('Captured real home/player/social previews, every binary-search frame, and EN/RU mobile screens.');
