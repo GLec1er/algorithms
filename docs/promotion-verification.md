@@ -29,3 +29,9 @@ Implementation decisions: use an isolated clone to protect the existing other-ch
 Browser automation ran in Chrome on this host; CI runs the same suite with Chromium. This does not establish coverage of every browser or every possible input. The site replays prepared examples and does not execute arbitrary Python. Hash-route pages share the static social metadata. The GitHub custom social preview image can optionally be set from `public/social-preview.png`; the website's Open Graph metadata already references it.
 
 Merging and live deployment are separate from this prepared release. No promotion posts were sent and no star count is guaranteed.
+
+## Design refinement
+
+The home page now puts a real, manually started binary-search trace next to concise copy. Generic three-step marketing cards were removed; the pattern library uses compact rows. Language and theme choices use styled native-radio groups with visible selected/focus states and icon hints. The narrow header fits two compact rows.
+
+`tests/design-polish-browser.mjs` exercises keyboard theme selection and persistence, stepping/playing/resetting the demo, its independently known result (index 1 for target 2 in [1,3,5,6]), language changes without resetting the current demo frame, no study-credit writes from the demo, failed loading, and first-screen array/playback visibility at 320, 390, 635, 768, 1024 and 1440 px in both languages. These checks join the existing full browser suite.

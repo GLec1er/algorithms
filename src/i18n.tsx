@@ -1,3 +1,4 @@
+import SegmentedControl from './components/SegmentedControl';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { type Locale, resolveLocale, languageUrl, setCurrentLocale } from './locale';
 const Context=createContext<{locale:Locale;setLocale:(locale:Locale)=>void}>({locale:'en',setLocale:()=>{}});
@@ -10,4 +11,7 @@ export function LocaleProvider({children}:{children:ReactNode}) {
  return <Context.Provider value={{locale,setLocale}}>{children}</Context.Provider>;
 }
 export const useLocale=()=>useContext(Context);
-export function LanguageToggle(){const {locale,setLocale}=useLocale();return <label className="language-toggle"><span aria-hidden="true">文</span><select aria-label={locale==='en'?'Language':'Язык'} value={locale} onChange={e=>setLocale(e.target.value as Locale)}><option value="en">English</option><option value="ru">Русский</option></select></label>;}
+export function LanguageToggle(){
+ const {locale,setLocale}=useLocale();
+ return <SegmentedControl<Locale> className="language-segments" label={locale==='en'?'Language':'Язык'} value={locale} onChange={setLocale} options={[{value:'en',label:'English',content:'EN'},{value:'ru',label:'Русский',content:'RU'}]}/>;
+}

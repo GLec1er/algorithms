@@ -7,14 +7,14 @@ export async function checkPromotion(browser,url=base){
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.clock.setFixedTime('2026-10-19T12:00:00Z');
  await page.goto(url);
- await page.getByRole('heading',{name:'Understand the pattern. Watch the code.',exact:true}).waitFor({timeout:5000});
+ await page.getByRole('heading',{name:'Coding interview patterns in Python.',exact:true}).waitFor({timeout:5000});
  assert.equal(await page.locator('html').getAttribute('lang'),'en');
  await page.getByRole('link',{name:'Try binary search',exact:true}).click();
  await page.getByLabel('Animation step', {exact:true}).fill('4');
  await page.getByLabel('Example',{exact:true}).selectOption('2');
  await page.getByLabel('Animation step',{exact:true}).fill('3');
  await page.getByRole('button',{name:'Mark as understood',exact:true}).click();
- await page.getByLabel('Language',{exact:true}).selectOption('ru');
+ await page.getByRole('group',{name:'Language',exact:true}).getByRole('radio',{name:'Русский',exact:true}).check();
  assert.equal(await page.getByLabel('Шаг анимации').inputValue(),'3');
  assert.equal(await page.getByLabel('Пример',{exact:true}).inputValue(),'2');
  await page.getByRole('button',{name:'Убрать отметку',exact:true}).waitFor();

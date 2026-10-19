@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { checkPractice } from './practice-browser.mjs';
 import {checkPromotion,checkEnglishCurriculum} from './promotion-browser.mjs';
+import {checkDesignPolish} from './design-polish-browser.mjs';
 import { checkDesign } from './design-browser.mjs';
 
 const base = process.env.LAB_URL || 'http://127.0.0.1:4173/algorithms/';
@@ -13,6 +14,7 @@ const errors=[];
 page.on('pageerror', error=>errors.push(error.message));
 try {
   fs.mkdirSync('test-results',{recursive:true});
+  await checkDesignPolish(browser,base);
   await checkPromotion(browser,base);
   await checkEnglishCurriculum(browser,base);
   await checkDesign(browser,russianBase);

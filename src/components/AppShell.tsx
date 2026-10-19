@@ -29,8 +29,8 @@ export default function AppShell({ activeRoute, catalog, children, completedCoun
       </a>
       <button className="catalog-trigger" ref={opener} onClick={open} aria-label={t("Открыть каталог")} aria-haspopup="dialog" aria-expanded={opened} aria-controls="lesson-catalog"><Icon name="menu"/><span>{t("Каталог")}</span></button>
       <nav className="section-switch" aria-label={t("Разделы приложения")}>
-        <a href={`#/problem/${lastLesson.current}`} aria-current={activeRoute !== 'calendar' && activeRoute !== 'home' ? 'page' : undefined}>{t("Практика")}</a>
-        <a href="#/calendar" aria-label={t("Календарь практики")} aria-current={activeRoute === 'calendar' ? 'page' : undefined}>{t("Календарь")}</a>
+        <a href={`#/problem/${lastLesson.current}`} aria-label={t("Практика")} title={t("Практика")} aria-current={activeRoute !== 'calendar' && activeRoute !== 'home' ? 'page' : undefined}><span className="nav-icon"><Icon name="play"/></span><span className="nav-label">{t("Практика")}</span></a>
+        <a href="#/calendar" aria-label={t("Календарь практики")} title={t("Календарь практики")} aria-current={activeRoute === 'calendar' ? 'page' : undefined}><span className="nav-icon"><Icon name="calendar"/></span><span className="nav-label">{t("Календарь")}</span></a>
       </nav>
       <div className="topbar-right">
         <span className="local-progress" title={t("Отметки сохраняются в этом браузере")}><span className="progress-ring" style={{ '--progress': `${completedCount / lessonCount * 100}%` } as CSSProperties}/><span><strong>{completedCount}</strong><span> / {lessonCount}</span></span></span>
