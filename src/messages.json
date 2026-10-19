@@ -214,5 +214,6 @@
   "Закрыть цель 5 будней подряд": "Meet the goal for 5 consecutive weekdays",
   "Паттерн освоен": "Pattern understood",
   "Разобрать все задачи одной главы": "Understand every problem in one chapter",
-  "узел #{0}": "node #{0}"
+  "узел #{0}": "node #{0}",
+  "На главную": "Home"
 }

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {expect,chromium} from '@playwright/test';
+import {openAppearance} from './ui-controls.mjs';
 export async function checkDesignPolish(browser,base){
  const page=await browser.newPage({viewport:{width:1440,height:1000},colorScheme:'light',reducedMotion:'reduce'});
  try{
@@ -20,13 +21,16 @@ export async function checkDesignPolish(browser,base){
   await language.getByRole('radio',{name:'Русский',exact:true}).check();
   await expect(page.getByTestId('demo-step')).toHaveText('2');
   assert.equal(await page.evaluate(()=>localStorage.getItem('patterns-study-v2')),saved,'Demo never awards progress');
+  await openAppearance(page);
   const themes=page.getByRole('group',{name:'Оформление',exact:true});
   await themes.getByRole('radio',{name:'Светлая',exact:true}).focus();
   await page.keyboard.press('ArrowRight');
   await expect(themes.getByRole('radio',{name:'Тёмная',exact:true})).toBeChecked();
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
   await page.reload();
+  await openAppearance(page);
   await expect(page.getByRole('group',{name:'Оформление',exact:true}).getByRole('radio',{name:'Тёмная',exact:true})).toBeChecked();
+  await page.keyboard.press('Escape');
   for(const locale of ['en','ru'])for(const width of [320,390,635,768,1024,1440]){
    await page.setViewportSize({width,height:900});await page.goto(base+'?lang='+locale+'#/');
    const region=page.getByRole('region',{name:locale==='en'?'Binary search demo':'Демо бинарного поиска',exact:true});
@@ -36,6 +40,7 @@ export async function checkDesignPolish(browser,base){
    assert.ok(layout.header<=120,`${locale}/${width}: header should fit two compact rows`);
    assert.ok(layout.playTop<780,`${locale}/${width}: demo playback should be available in the first screen`);
    assert.ok(layout.arrayTop<780,`${locale}/${width}: actual algorithm visible in the first screen`);
+   assert.ok(await region.locator('.demo-data').evaluate(el=>el.querySelector('.array-cell:last-of-type').getBoundingClientRect().right<=el.querySelector('.scene-scroll').getBoundingClientRect().right+1),`${locale}/${width}: all four demo values fit beside Py`);
    const next=region.getByRole('button',{name:locale==='en'?'Next demo step':'Следующий шаг демо',exact:true});
    for(let i=1;i<17;i++)await next.click();
    await expect(region.getByTestId('demo-result')).toHaveText(locale==='en'?'Insertion index: 1':'Позиция вставки: 1');
