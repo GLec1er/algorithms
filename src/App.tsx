@@ -7,6 +7,8 @@ import Code from './components/Code';
 import { PatternGlyph } from './components/PatternGlyph';
 import PatternGuide from './components/PatternGuide';
 import PracticeCalendar from './components/PracticeCalendar';
+import AppShell from './components/AppShell';
+import Icon from './components/Icon';
 import { localDay, parseProgress, practiceStats, toggleLesson, type StudyProgress } from './progress';
 
 const chapters=data.chapters as Chapter[],lessons=data.lessons as Lesson[];
@@ -14,15 +16,8 @@ const byId=new Map(lessons.map(l=>[l.id,l]));
 const levels:Record<string,string>={Easy:'Легко',Medium:'Средне',Hard:'Сложно'};
 const safeRead=(key:string,fallback:string)=>{try{return localStorage.getItem(key)??fallback;}catch{return fallback;}};
 const safeWrite=(key:string,value:string)=>{try{localStorage.setItem(key,value);return true;}catch{return false;}};
-const go=(id:string)=>{location.hash=`/problem/${id}`;};
 const route=()=>location.hash==='#/calendar'?'calendar':location.hash.startsWith('#/problem/')?decodeURIComponent(location.hash.slice(10)):location.hash&&location.hash!=='#/'?'unknown':safeRead('patterns-last','insertion_index');
 
-function Icon({name}:{name:string}) {
-  const paths:Record<string,React.ReactNode>={
-    calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 11h18m-12 4h2"/></>,play:<path d="m8 5 10 7-10 7Z"/>,pause:<><path d="M8 5v14M16 5v14"/></>,prev:<><path d="M5 5v14m13-14-9 7 9 7"/></>,next:<><path d="M19 5v14M6 5l9 7-9 7"/></>,reset:<><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></>,arrow:<path d="M5 12h14m-6-6 6 6-6 6"/>,menu:<path d="M4 6h16M4 12h16M4 18h16"/>,search:<><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></>,check:<path d="m5 12 4 4L19 6"/>,github:<><path d="M9 19c-4 1-4-2-6-2m12 5v-4c0-1 .1-1.7-.5-2.3 3.3-.4 6.5-1.6 6.5-7A5.5 5.5 0 0 0 19.5 5c.2-1 .1-2-.3-3-1.3 0-2.7.6-3.7 1.4a13 13 0 0 0-7 0A7 7 0 0 0 4.8 2a6 6 0 0 0-.3 3A5.5 5.5 0 0 0 3 8.7c0 5.4 3.2 6.6 6.5 7C9 16.3 9 17 9 18v4"/></>,
-  };
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
-}
 
 function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggle:()=>void}) {
   const chapter=chapters[lesson.chapter-1];
@@ -44,7 +39,7 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
   const move=(next:number)=>{setPlaying(false);setStep(Math.max(0,Math.min(frames.length-1,next)));};
   useEffect(()=>{
     const handle=(e:KeyboardEvent)=>{
-      if((e.target as HTMLElement).closest('input,select,textarea,a'))return;
+      if((e.target as HTMLElement).closest('input,select,textarea,a,dialog'))return;
       if(e.key==='ArrowRight'){e.preventDefault();move(step+1);}
       if(e.key==='ArrowLeft'){e.preventDefault();move(step-1);}
       if(e.key===' '&&!(e.target as HTMLElement).closest('button')){e.preventDefault();setPlaying(p=>!p);}
@@ -55,9 +50,8 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
   return <article className="lesson-content">
     <div className="breadcrumb"><a href="#/problem/pair_sum_sorted">Библиотека паттернов</a><span>/</span><span>{chapter.ru}</span></div>
     <div className="lesson-heading"><span className="chapter-badge" aria-hidden="true">{lesson.chapter}</span><div><div className="eyebrow">Глава {lesson.chapter} · {chapter.title}</div><h1>{lesson.ru}</h1><p className="original-title">{lesson.title}</p></div></div>
-    <div className="lesson-meta"><span className={`difficulty ${lesson.difficulty.toLowerCase()}`}><span className="difficulty-bars" aria-hidden="true"><i/><i/><i/></span>{levels[lesson.difficulty]}</span><span className="complexity-chip"><span>Время</span> {lesson.time}</span><span className="language-chip"><b>Py</b> Python 3</span><span className="lesson-position">{lessons.filter(l=>l.chapter===lesson.chapter).findIndex(l=>l.id===lesson.id)+1} / {lessons.filter(l=>l.chapter===lesson.chapter).length} в главе</span><button className={`complete-button ${completed?'is-complete':''}`} aria-label={completed?'Убрать отметку':'Отметить как разобранное'} onClick={toggle}><Icon name="check"/><span>{completed?'Разобрано':'Отметить'}</span></button></div>
+    <div className="lesson-meta"><span className={`difficulty ${lesson.difficulty.toLowerCase()}`}><span className="difficulty-bars" aria-hidden="true"><i/><i/><i/></span>{levels[lesson.difficulty]}</span><span className="complexity-chip"><span>Время</span> {lesson.time}</span><span className="language-chip"><b>Py</b> Python 3</span><span className="lesson-position">{lessons.filter(l=>l.chapter===lesson.chapter).findIndex(l=>l.id===lesson.id)+1} / {lessons.filter(l=>l.chapter===lesson.chapter).length} в главе</span></div>
     <div className="problem-brief"><span className="brief-label">УСЛОВИЕ<span>↳</span></span><p className="statement">{lesson.statement}</p></div>
-    <PatternGuide chapter={chapter} lessons={lessons} current={lesson.id}/>
     {error?<div className="error-card" role="alert"><p>{error}</p><button onClick={()=>location.reload()}>Повторить загрузку</button></div>:!payload||!frame||!example?<div className="loading-card"><span className="loading-spinner"/>Готовим визуализацию…</div>:<>
       <div className="workspace-grid">
         <section className="visual-panel" aria-label="Визуализация алгоритма"><header className="panel-heading"><div><span className="panel-number">01</span><strong>Визуализация</strong></div><span className={`play-status ${playing?'playing':''}`}><i/>{frame.done?'Завершено':playing?'В движении':'На паузе'}</span></header>
@@ -71,15 +65,18 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
         <aside className="execution-panel"><Code code={payload.code} line={frame.line} support={payload.support} filename={lesson.id}/><section className="variables-panel"><button className="variables-toggle" aria-expanded={variablesOpen} onClick={()=>setVariablesOpen(o=>!o)}><span><span className="panel-number">02</span>Переменные</span><span>{variablesOpen?'−':'+'}</span></button>{variablesOpen&&<div className="variables">{scalarEntries.length?scalarEntries.map(([k,v])=><div key={k}><code>{k}</code><strong>{pretty(v)}</strong></div>):<p>Переменные появятся по ходу выполнения.</p>}</div>}</section></aside>
       </div>
       <section className={`result-strip ${frame.done?'done':''}`}><div><span className="result-icon">{frame.done?'✓':'→'}</span><div><small>{frame.done?'РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ':'ОЖИДАЕМЫЙ ОТВЕТ'}</small><code>{pretty(frame.done?frame.result:example.expected)}</code></div></div>{frame.done&&<span className="result-match">{JSON.stringify(frame.result)===JSON.stringify(example.expected)?'Результат совпадает':'Проверьте результат'}</span>}<details><summary>Входные данные</summary><pre>{JSON.stringify(example.args,null,2)}</pre></details></section>
+    <PatternGuide chapter={chapter} lessons={lessons} current={lesson.id}/>
       <div className="learning-notes"><section><div className="note-icon">{'{ }'}</div><div><h2>Почему это работает</h2><p>{lesson.idea}</p><p className="invariant"><strong>Инвариант.</strong> {chapter.invariant}</p></div></section><section><div className="note-icon">!</div><div><h2>На что обратить внимание</h2><p>{chapter.pitfall}</p><div className="complexity"><span>Время<strong>{lesson.time}</strong></span><span>Память<strong>{lesson.space}</strong></span></div></div></section></div>
+      <section className="lesson-completion"><div><strong>Разобрался с задачей?</strong><p>Отметь её, чтобы сохранить свой прогресс.</p></div><button className={`complete-button ${completed?'is-complete':''}`} aria-label={completed?'Убрать отметку':'Отметить как разобранное'} onClick={toggle}><Icon name="check"/><span>{completed?'Разобрано':'Задача разобрана'}</span></button></section>
       <div className="lesson-footer"><a href={lesson.source} target="_blank" rel="noreferrer">Задачи и книга · ByteByteGo ↗</a><span>← → по шагам · пробел — пауза</span></div>
       <nav className="lesson-pagination" aria-label="Следующая задача">{index>0?<a href={`#/problem/${lessons[index-1].id}`}><small>← ПРЕДЫДУЩАЯ</small><strong>{lessons[index-1].ru}</strong></a>:<div/>}{index<lessons.length-1&&<a href={`#/problem/${lessons[index+1].id}`}><small>СЛЕДУЮЩАЯ →</small><strong>{lessons[index+1].ru}</strong></a>}</nav>
     </>}
+    {(!payload||!frame||!example)&&<PatternGuide chapter={chapter} lessons={lessons} current={lesson.id}/>}
   </article>;
 }
 
 export default function App(){
-  const [id,setId]=useState(()=>{try{return route();}catch{return 'unknown';}}),[search,setSearch]=useState(''),[difficulty,setDifficulty]=useState('all'),[mobile,setMobile]=useState(false);
+  const [id,setId]=useState(()=>{try{return route();}catch{return 'unknown';}}),[search,setSearch]=useState(''),[difficulty,setDifficulty]=useState('all');
   const [expanded,setExpanded]=useState(()=>new Set([byId.get(id)?.chapter??6]));
   const [today,setToday]=useState(localDay);
   const [progress,setProgress]=useState<StudyProgress>(()=>parseProgress(safeRead('patterns-study-v2',''),safeRead('patterns-progress','[]'),localDay(),lessons.map(l=>l.id)));
@@ -91,7 +88,7 @@ export default function App(){
   useEffect(()=>{const receive=(e:StorageEvent)=>{if(e.key==='patterns-study-v2'&&e.newValue)setProgress(parseProgress(e.newValue,null,localDay(),lessons.map(l=>l.id)));};window.addEventListener('storage',receive);return()=>window.removeEventListener('storage',receive);},[]);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),4000);return()=>clearTimeout(timer);},[notice]);
   const lesson=byId.get(id);
-  useEffect(()=>{const onHash=()=>{try{setId(route());}catch{setId('unknown');}setMobile(false);setToday(localDay());};window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash);},[]);
+  useEffect(()=>{const onHash=()=>{try{setId(route());}catch{setId('unknown');}setToday(localDay());};window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash);},[]);
   useEffect(()=>{if(lesson){safeWrite('patterns-last',id);setExpanded(new Set([lesson.chapter]));document.title=`${lesson.ru} · Coding Patterns Lab`;}else if(id==='calendar'){document.title='Календарь практики · Algorithms Lab';}window.scrollTo(0,0);},[id]);
   const filtered=useMemo(()=>{const q=search.toLocaleLowerCase('ru').replaceAll('ё','е').trim();return lessons.filter(l=>(difficulty==='all'||l.difficulty===difficulty)&&`${l.ru} ${l.title} ${chapters[l.chapter-1].ru} ${chapters[l.chapter-1].title}`.toLocaleLowerCase('ru').replaceAll('ё','е').includes(q));},[search,difficulty]);
   const toggle=()=>{
@@ -102,20 +99,20 @@ export default function App(){
     setProgress(toggleLesson(base,id,day));setToday(day);
     setNotice(isNew?'Новая задача: +100 XP. Отличный шаг!':base.completed.includes(id)?'Отметка снята для повторения. История первого закрытия сохранена.':'Отметка восстановлена. Повторение не приносит XP повторно.');
   };
-  return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="#/problem/insertion_index" aria-label="Algorithms Lab"><span className="brand-mark"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="m14 11-8 9 8 9m12-18 8 9-8 9M22 8l-4 24"/></svg></span><span className="brand-word">Algorithms <b>Lab</b></span></a><button className="mobile-menu" aria-label="Открыть оглавление" onClick={()=>setMobile(m=>!m)}><Icon name="menu"/></button><div className="topbar-label"><span>{id==='calendar'?'Практика':`Глава ${lesson?.chapter??1}`}</span><strong>{id==='calendar'?'Календарь и достижения':chapters[(lesson?.chapter??1)-1].ru}</strong></div><div className="topbar-right"><a className="calendar-link" href="#/calendar" aria-label="Календарь практики" aria-current={id==='calendar'?'page':undefined}><Icon name="calendar"/><span>Календарь</span></a><span className="local-progress" title="Отметки сохраняются в этом браузере"><span className="progress-ring" style={{background:`conic-gradient(#7d80f7 ${completed.size/101*100}%, #2d3038 0)`}}/><span><strong>{completed.size}</strong> / 101 разобрано</span></span><a className="github-link" href="https://github.com/GLec1er/algorithms" target="_blank" rel="noreferrer"><Icon name="github"/><span>GitHub</span>↗</a></div></header>
-    {mobile&&<button className="sidebar-scrim" aria-label="Закрыть оглавление" onClick={()=>setMobile(false)}/>}
-    <aside className={`sidebar ${mobile?'is-open':''}`} aria-label="Оглавление книги">
+  const catalog=(
+    <aside className="sidebar" aria-label="Оглавление книги">
       <div className="sidebar-caption"><span>CODING INTERVIEW PATTERNS</span><p>Главы и задачи</p></div>
       <div className="search-box"><Icon name="search"/><input placeholder="Найти задачу или паттерн" aria-label="Поиск задач" value={search} onChange={e=>setSearch(e.target.value)}/>{search&&<button aria-label="Очистить поиск" onClick={()=>setSearch('')}>×</button>}</div>
       <div className="catalog-controls"><span>{search||difficulty!=='all'?`${filtered.length} найдено`:'ПАТТЕРНЫ / 19'}</span><select aria-label="Сложность" value={difficulty} onChange={e=>setDifficulty(e.target.value)}><option value="all">Все уровни</option><option value="Easy">Легко</option><option value="Medium">Средне</option><option value="Hard">Сложно</option></select></div>
-      <nav className="chapter-nav">{!filtered.length&&<div className="nothing-found">Ничего не найдено<button onClick={()=>{setSearch('');setDifficulty('all');}}>Сбросить фильтры</button></div>}{chapters.map(ch=>{const matches=filtered.filter(l=>l.chapter===ch.id);if(!matches.length)return null;const open=expanded.has(ch.id)||!!search||difficulty!=='all';return <div className={`chapter-group ${lesson?.chapter===ch.id?'current-chapter':''}`} key={ch.id}><button className="chapter-button" aria-expanded={open} onClick={()=>{setExpanded(old=>{const next=new Set(old);next.has(ch.id)?next.delete(ch.id):next.add(ch.id);return next;});if(lesson?.chapter!==ch.id)go(matches[0].id);}}><span className="chapter-icon"><PatternGlyph chapter={ch.id}/></span><span><small>{String(ch.id).padStart(2,'0')}</small>{ch.ru}</span><span className="chapter-count">{matches.length}</span><span className="chapter-chevron">{open?'−':'+'}</span></button>{open&&<div className="problem-links">{matches.map(l=><a key={l.id} data-testid="lesson-link" href={`#/problem/${l.id}`} className={id===l.id?'selected':''} aria-current={id===l.id?'page':undefined}><span className={`problem-dot ${completed.has(l.id)?'checked':''}`}>{completed.has(l.id)?'✓':''}</span><span>{l.ru}</span></a>)}</div>}</div>;})}</nav>
+      <nav className="chapter-nav">{!filtered.length&&<div className="nothing-found">Ничего не найдено<button onClick={()=>{setSearch('');setDifficulty('all');}}>Сбросить фильтры</button></div>}{chapters.map(ch=>{const matches=filtered.filter(l=>l.chapter===ch.id);if(!matches.length)return null;const open=expanded.has(ch.id)||!!search||difficulty!=='all';return <div className={`chapter-group ${lesson?.chapter===ch.id?'current-chapter':''}`} key={ch.id}><button className="chapter-button" aria-expanded={open} onClick={()=>{setExpanded(old=>{const next=new Set(old);next.has(ch.id)?next.delete(ch.id):next.add(ch.id);return next;});}}><span className="chapter-icon"><PatternGlyph chapter={ch.id}/></span><span><small>{String(ch.id).padStart(2,'0')}</small>{ch.ru}</span><span className="chapter-count">{matches.length}</span><span className="chapter-chevron">{open?'−':'+'}</span></button>{open&&<div className="problem-links">{matches.map(l=><a key={l.id} data-testid="lesson-link" href={`#/problem/${l.id}`} className={id===l.id?'selected':''} aria-current={id===l.id?'page':undefined}><span className={`problem-dot ${completed.has(l.id)?'checked':''}`}>{completed.has(l.id)?'✓':''}</span><span>{l.ru}</span></a>)}</div>}</div>;})}</nav>
       <div className="sidebar-progress"><div><span>ВАШ ПРОГРЕСС</span><strong>{Math.round(completed.size/101*100)}<small>%</small></strong></div><div className="progress-track"><i style={{width:`${completed.size/101*100}%`}}/></div><p><strong>{completed.size}</strong> из 101 задач разобрано</p><a className="sidebar-habit" href="#/calendar"><span>{practice.finished?'Курс пройден ✓':practice.todayCount?'Цель сегодня закрыта ✓':'Цель: 1 новая задача в будни'}</span><b>{practice.currentStreak} ↗</b></a></div><div className="sidebar-bottom"><div className="book-icon">≡</div><div><strong>19 глав · 101 задача</strong><span>Alex Xu & Shaun Gunawardane</span></div><a href="https://github.com/GLec1er/algorithms" target="_blank" rel="noreferrer" aria-label="Репозиторий GitHub"><Icon name="github"/></a></div>
     </aside>
+  );
+  return <AppShell activeRoute={id} catalog={catalog} completedCount={completed.size} lessonCount={lessons.length}>
     <main className="main">
       {id==='calendar'?<PracticeCalendar progress={progress} today={today} lessons={lessons} chapters={chapters} storageAvailable={storageAvailable}/>:lesson?<Player key={lesson.id} lesson={lesson} completed={completed.has(id)} toggle={toggle}/>:<div className="not-found"><span>404</span><h1>Задача не найдена</h1><p>Откройте задачу из оглавления или начните с первой главы.</p><a href="#/problem/pair_sum_sorted">К первой задаче</a></div>}
       <footer className="site-footer"><span>Algorithms <span className="footer-lab">Lab</span> · Coding Interview Patterns</span><span>Учебный спутник книги Coding Interview Patterns · 2026</span></footer>
     </main>
     {notice&&<div className="practice-toast" role="status">{notice}</div>}
-  </div>;
+  </AppShell>;
 }

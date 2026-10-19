@@ -2,6 +2,7 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { checkPractice } from './practice-browser.mjs';
+import { checkDesign } from './design-browser.mjs';
 
 const base = process.env.LAB_URL || 'http://127.0.0.1:4173/algorithms/';
 const browser = await chromium.launch({ headless:true, ...(process.env.CI ? {} : {channel:'chrome'}) });
@@ -10,6 +11,7 @@ const errors=[];
 page.on('pageerror', error=>errors.push(error.message));
 try {
   fs.mkdirSync('test-results',{recursive:true});
+  await checkDesign(browser,base);
   await checkPractice(browser,base);
   await page.goto(base+'#/problem/lcs');
   await page.getByLabel('Шаг анимации').waitFor();
@@ -35,10 +37,12 @@ try {
   await page.getByRole('button',{name:'Отметить как разобранное'}).click();
   await page.reload();
   await page.getByRole('button',{name:'Убрать отметку'}).waitFor();
+  await page.getByRole('button',{name:'Открыть каталог',exact:true}).click();
   await page.getByPlaceholder('Найти задачу или паттерн').fill('интервал');
   assert.ok(await page.locator('[data-testid="lesson-link"]').count() > 0);
   await page.getByPlaceholder('Найти задачу или паттерн').fill('неттакойзадачи');
   await page.getByText('Ничего не найдено').waitFor();
+  await page.getByRole('button',{name:'Закрыть каталог',exact:true}).click();
   await page.goto(base+'#/problem/unknown');
   await page.getByText('Задача не найдена').waitFor();
   await page.getByRole('link',{name:'К первой задаче'}).click();
@@ -63,7 +67,9 @@ try {
   }
   await page.goto(base+'#/problem/insertion_index');
   await page.getByLabel('Шаг анимации').waitFor();
+  await page.getByRole('button',{name:'Открыть каталог',exact:true}).click();
   await page.getByPlaceholder('Найти задачу или паттерн').fill('');
+  await page.getByRole('button',{name:'Закрыть каталог',exact:true}).click();
   await page.getByLabel('Шаг анимации').fill('3');
   await page.getByRole('heading',{name:'Позиция вставки',exact:true}).click();
   await page.evaluate(()=>window.scrollTo(0,0));
