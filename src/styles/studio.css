@@ -2,7 +2,8 @@
 .studio-shell { padding: 0 0 0 72px; }
 .studio-rail { position: fixed; z-index: 45; inset: 0 auto 0 0; display: flex; flex-direction: column; align-items: center; gap: 22px; width: 72px; padding: 0 0 22px; border-right: 1px solid var(--line); background: var(--bg); }
 .rail-brand { display: grid; place-items: center; flex-shrink: 0; width: 100%; height: 72px; color: var(--accent); }
-.rail-brand svg { display: block; width: 42px; height: 42px; }
+.rail-brand .brand-symbol { display: block; width: 46px; height: 46px; }
+.brand-mark .brand-symbol { display: block; width: 100%; height: 100%; }
 .studio-rail nav { display: grid; gap: 12px; }
 .studio-rail nav a, .studio-rail nav button, .rail-source { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid transparent; border-radius: 4px; color: var(--muted); }
 .studio-rail nav [aria-current], .studio-rail nav button[aria-expanded="true"] { color: var(--accent); background: var(--card2); border-color: var(--line); }
@@ -161,7 +162,7 @@
  .studio-shell { padding: 0; }
  .studio-rail { display: none; }
  .topbar { padding: 9px 20px; }
- .brand-mark { background: none; border: 1px solid var(--line); border-radius: 4px; box-shadow: none; }
+ .brand-mark { background: none; border: 0; border-radius: 0; box-shadow: none; }
  .section-switch { background: none; }
  .section-switch a { padding-inline: 12px; border-radius: 3px; }
  .topbar-right { gap: 13px; }

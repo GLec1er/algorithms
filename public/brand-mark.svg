@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="plate" x1="10" y1="4" x2="54" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#343c3e"/><stop offset="1" stop-color="#151a1d"/>
+    </linearGradient>
+    <linearGradient id="armor" x1="20" y1="16" x2="45" y2="51" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff3d9"/><stop offset=".5" stop-color="#d9c8a9"/><stop offset="1" stop-color="#ae9674"/>
+    </linearGradient>
+  </defs>
+  <path d="M16 2.75h32L61.25 16v32L48 61.25H16L2.75 48V16Z" fill="url(#plate)" stroke="#707774" stroke-width="1.5"/>
+  <path d="M17 6h29l12 12v28" stroke="#a8a897" stroke-opacity=".35" stroke-linecap="round"/>
+  <path d="M6 42v5l11 11h12" stroke="#e9aa58" stroke-width="2" stroke-linecap="round"/>
+  <path d="M36 20c-13-1-20 5-20 14 0 9 8 15 17 15h8c7 0 11-4 11-10s-4-10-11-10H30" stroke="#101719" stroke-width="13" stroke-linecap="round"/>
+  <path d="M36 19c-13-1-20 5-20 14 0 9 8 15 17 15h8c7 0 11-4 11-10s-4-10-11-10H30" stroke="url(#armor)" stroke-width="9" stroke-linecap="round"/>
+  <path d="m23 21 4 7m-15 5h8m-2 10 6-6m9 7v8m13-11 5 6" stroke="#37403e" stroke-width="2"/>
+  <path d="m33 12 10-1 11 8-4 9H38l-9-8Z" fill="#e9dcc1" stroke="#162022" stroke-width="2" stroke-linejoin="round"/>
+  <path d="m33 13 9 1 8 7-12-2-7 2" fill="#fff2d6"/>
+  <path d="m38 20 12 1-2 5h-9l-6-5" fill="#bdab8a"/>
+  <path d="m42 16 7 4-6 2-4-2Z" fill="#202a2b"/>
+  <path d="m44 17 3 3-3 1-2-2Z" fill="#ffc169"/>
+  <path d="m48 24 3-1" stroke="#35403e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M30 28h6" stroke="#f4b65f" stroke-width="4" stroke-linecap="round"/>
+</svg>
