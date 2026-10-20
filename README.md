@@ -6,7 +6,7 @@ Explore **101 Python interview problems** through step-by-step execution visuali
 
 **[Try the live demo →](https://glec1er.github.io/algorithms/)** · [Start with binary search](https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index) · [Русский README](README.ru.md)
 
-![Binary search in Algorithms Lab: Python code, pointers and execution state](docs/media/binary-search.gif)
+[![Algorithms Lab home: a live binary-search example beside the pattern library entry point](docs/media/home.png)](https://glec1er.github.io/algorithms/)
 
 - **See what every line changes.** Arrays, pointers, linked nodes, trees, graphs, heaps, DP tables, a call stack and local variables stay connected to the displayed Python.
 - **Learn the reasoning.** Each pattern includes recognition signals, an invariant, a worked example, comparisons and common mistakes.
@@ -14,6 +14,14 @@ Explore **101 Python interview problems** through step-by-step execution visuali
 - **Make the workspace yours.** Choose light, dark or system appearance. Py, an optional robot-python companion, reacts to the trace; pause its motion or hide it from Appearance. Reduced motion is respected. [How Py works](docs/mascot.md).
 
 No account or server required. No analytics. MIT licensed.
+
+## Try a one-minute walkthrough
+
+1. Open [Find the insertion index](https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index): find where `2` belongs in `[1, 3, 5, 6]`.
+2. Press **→** to step or **Space** to play. Follow `left`, `mid` and `right` beside the Python code; the final answer is index `1`. Each highlighted line shows the state **before** it runs.
+3. Choose another **Example**, open the **Binary Search** pattern guide below the player, or switch **EN / RU** without losing your place.
+
+![Binary search walkthrough: pointers, Python code and recorded execution state](docs/media/binary-search.gif)
 
 ## Explore
 
