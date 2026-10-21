@@ -8,6 +8,10 @@ import math
 import sys
 import types
 import tokenize
+from pathlib import Path
+
+EXAMPLE_EN = json.loads((Path(__file__).parent / "example_labels.json").read_text(encoding='utf-8'))
+COMMENT_RU = json.loads((Path(__file__).parent / "comment_translations.json").read_text(encoding='utf-8'))
 from collections import deque
 from . import structures
 
@@ -53,7 +57,7 @@ def node_snapshot():
             for n in structures.NODES]
 
 
-def instruction(source):
+def instruction(source, locale="ru"):
     statement = source.strip()
     try:
         for token in tokenize.generate_tokens(io.StringIO(statement).readline):
@@ -61,25 +65,25 @@ def instruction(source):
                 comment = token.string[1:].strip()
                 statement = statement[:token.start[1]].rstrip()
                 if comment:
-                    return comment
+                    return COMMENT_RU.get(comment, comment) if locale == "ru" else comment
                 break
     except (tokenize.TokenError, IndentationError):
         pass  # A line belonging to a multiline statement still gets a safe fallback.
     if statement.startswith('return'):
-        return 'Возвращаем ответ текущего вызова.'
+        return ('Возвращаем ответ текущего вызова.' if locale == 'ru' else 'Return the answer of this call.')
     if statement.startswith(('if ', 'elif ', 'while ')):
-        return 'Проверяем условие: ' + statement.rstrip(':')
+        return ('Проверяем условие: ' if locale == 'ru' else 'Check the condition: ') + statement.rstrip(':')
     if statement.startswith('for '):
-        return 'Переходим к следующему элементу цикла.'
+        return ('Переходим к следующему элементу цикла.' if locale == 'ru' else 'Advance to the next loop element.')
     if '.append(' in statement or '.add(' in statement or 'heappush(' in statement:
-        return 'Добавляем элемент и обновляем состояние структуры.'
+        return ('Добавляем элемент и обновляем состояние структуры.' if locale == 'ru' else 'Add an element and update the data structure.')
     if '.pop(' in statement or '.popleft(' in statement or 'heappop(' in statement:
-        return 'Извлекаем элемент для дальнейшей обработки.'
+        return ('Извлекаем элемент для дальнейшей обработки.' if locale == 'ru' else 'Remove an element for further processing.')
     if statement.startswith('def '):
-        return 'Определяем вспомогательную подзадачу.'
+        return ('Определяем вспомогательную подзадачу.' if locale == 'ru' else 'Define a helper subproblem.')
     if statement.startswith(('from ', 'import ')):
-        return 'Подключаем используемые структуры данных.'
-    return 'Следующее действие: ' + statement
+        return ('Подключаем используемые структуры данных.' if locale == 'ru' else 'Import the data structures used here.')
+    return ('Следующее действие: ' if locale == 'ru' else 'Next operation: ') + statement
 
 
 def trace(function, args, limit=1800):
@@ -137,10 +141,11 @@ def trace(function, args, limit=1800):
         for scope in chain:
             state.update(locals_snapshot(scope.f_locals))
         line = max(1, min(len(lines), frame.f_lineno - start + 1))
-        item = dict(line=line, message=instruction(lines[line - 1]), state=state, nodes=node_snapshot(), arrays=identities(state),
+        item = dict(line=line, message=instruction(lines[line - 1]), messageEn=instruction(lines[line - 1], "en"), state=state, nodes=node_snapshot(), arrays=identities(state),
                     calls=[dict(name=f.f_code.co_name, line=f.f_lineno - start + 1) for f in chain], done=False)
         if event == 'return':
             item['message'] = f"Возврат из {frame.f_code.co_name}: {json.dumps(freeze(value), ensure_ascii=False)}"
+            item['messageEn'] = f"Return from {frame.f_code.co_name}: {json.dumps(freeze(value), ensure_ascii=False)}"
         if frame.f_code is function.__code__:
             last_root = item
         frames.append(item)
@@ -153,7 +158,7 @@ def trace(function, args, limit=1800):
     finally:
         sys.settrace(previous)
     terminal = copy.deepcopy(last_root or frames[-1])
-    terminal.update(done=True, result=freeze(result), message='Алгоритм завершён. Сравните результат с ожидаемым ответом.', nodes=node_snapshot(), calls=[])
+    terminal.update(done=True, result=freeze(result), message='Алгоритм завершён. Сравните результат с ожидаемым ответом.', messageEn='Execution complete. Compare the result with the expected answer.', nodes=node_snapshot(), calls=[])
     frames.append(terminal)
     return dict(code=code, frames=frames, result=freeze(result))
 
@@ -167,7 +172,7 @@ def compile_lesson(lesson):
         if recorded['result'] != example['expected']:
             raise AssertionError((lesson['id'], recorded['result'], example['expected']))
         code = recorded['code']
-        examples.append(dict(**copy.deepcopy(example), frames=recorded['frames']))
+        examples.append(dict(**copy.deepcopy(example), labelEn=EXAMPLE_EN[example['label']], frames=recorded['frames']))
     payload = dict(id=lesson['id'], code=code, examples=examples)
     if any(f['nodes'] for e in examples for f in e['frames']):
         payload['support'] = inspect.getsource(structures)

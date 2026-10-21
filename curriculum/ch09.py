@@ -5,7 +5,7 @@ def merge_intervals(intervals):
         if not result or start > result[-1][1]:
             result.append([start, end])
         else:
-            result[-1][1] = max(result[-1][1], end)  # Расширяем только правую границу объединения.
+            result[-1][1] = max(result[-1][1], end)  # Extend only the right endpoint of the merged interval.
     return result
 
 
@@ -16,7 +16,7 @@ def interval_overlaps(a, b):
         end = min(a[i][1], b[j][1])
         if start <= end:
             result.append([start, end])
-        if a[i][1] < b[j][1]:  # Более короткий отрезок уже не пересечёт следующие отрезки другого набора.
+        if a[i][1] < b[j][1]:  # The earlier-ending interval cannot overlap later intervals from the other list.
             i += 1
         else:
             j += 1
@@ -28,7 +28,7 @@ def largest_overlap(intervals):
     for start, end in intervals:
         events.append((start, 1))
         events.append((end, -1))
-    events.sort()  # В общей точке -1 идёт раньше +1: интервалы полуоткрытые.
+    events.sort()  # At an equal coordinate, -1 precedes +1 because intervals are half-open.
     active, best = 0, 0
     for position, delta in events:
         active += delta

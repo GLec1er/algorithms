@@ -1,3 +1,4 @@
+import {t} from '../locale';
 import { useRef, type KeyboardEvent } from 'react';
 import { Syntax } from './Code';
 
@@ -16,7 +17,7 @@ export default function PythonEditor({value,onChange,line}:{value:string;onChang
   return <div className="python-editor">
     <div className="editor-gutter" ref={gutter} aria-hidden="true">{lines.map((_,i)=><div key={i} className={line===i+1?'is-current':''}>{i+1}</div>)}</div>
     <pre className="editor-paint" ref={paint} aria-hidden="true"><code>{lines.map((text,i)=><span key={i} className={`editor-source-line ${line===i+1?'is-current':''}`}><Syntax text={text||' '}/>{'\n'}</span>)}</code></pre>
-    <textarea ref={editor} aria-label="Python-решение" aria-describedby="editor-help" spellCheck={false} autoCorrect="off" autoCapitalize="off" wrap="off" value={value} onChange={event=>onChange(event.target.value)} onKeyDown={key} onScroll={event=>{
+    <textarea ref={editor} aria-label={t("Python-решение")} aria-describedby="editor-help" spellCheck={false} autoCorrect="off" autoCapitalize="off" wrap="off" value={value} onChange={event=>onChange(event.target.value)} onKeyDown={key} onScroll={event=>{
       if(paint.current){paint.current.scrollTop=event.currentTarget.scrollTop;paint.current.scrollLeft=event.currentTarget.scrollLeft;}
       if(gutter.current)gutter.current.scrollTop=event.currentTarget.scrollTop;
     }}/>

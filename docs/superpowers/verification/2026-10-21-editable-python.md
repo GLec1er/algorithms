@@ -20,3 +20,9 @@ Pyodide 314.0.7 loads from jsDelivr on demand. Initial runtime access needs a ne
 Existing examples are the input contract. Custom test editing, package installation, automatic complexity inference and automatic progress marking are outside this change. Drafts are local to this browser, one per lesson. Unsupported user types are shown as bounded text/data rather than inferred algorithm diagrams.
 
 CI now includes own-solution and real-runtime checks before Pages publication. This change has not been pushed or deployed.
+
+## Main integration / PR #9
+
+Merged `origin/main` at `eebf51c`, preserving the Technical Studio design, Py branding/companion, English/Russian curriculum, language controls, home screen, progress backups and sharing. Resolved README, npm scripts, lesson generator, Player and payload type conflicts by composing both implementations. Own-solution controls and trace messages now follow EN/RU; language changes preserve the draft and replay position.
+
+Integration checks: 26 Python tests, 16 Node tests, TypeScript and production build passed; the full current browser suite (including Py and all English lessons) and all 404 real Pyodide cases passed. Own-solution regression checks include EN/RU switching and both languages at 320/390 px.

@@ -1,3 +1,4 @@
+import {t} from '../locale';
 import type { Frame, Value } from '../types';
 import { isRef, pretty } from '../types';
 import { ArrayRow, Dictionary, Grid } from './primitives';
@@ -37,7 +38,7 @@ export default function UserScene({frame}:{frame:Frame}) {
   const arrays=entries.filter(([,value])=>Array.isArray(value)||typeof value==='string');
   const dictionaries=entries.filter(([,value])=>value&&typeof value==='object'&&!Array.isArray(value)&&!isRef(value));
   return <div className="user-scene">
-    <div className="user-scene-label">Реальное состояние вашего Python-кода</div>
+    <div className="user-scene-label">{t("Реальное состояние вашего Python-кода")}</div>
     {arrays.map(([name,value])=>{
       const values=typeof value==='string'?[...value]:value as Value[];
       if(values.length>0&&values.every(row=>Array.isArray(row)&&row.length===(values[0] as Value[]).length&&row.every(cell=>cell===null||typeof cell!=='object')))
@@ -45,10 +46,10 @@ export default function UserScene({frame}:{frame:Frame}) {
       return values.some(v=>Array.isArray(v)||v&&typeof v==='object')?<div className="user-complex" key={name}><span>{name}</span><pre>{JSON.stringify(value,null,2)}</pre></div>:<ArrayRow key={name} name={name} values={values} frame={frame}/>;
     })}
     {dictionaries.map(([name,value])=><Dictionary key={name} name={name} value={value as Record<string,Value>}/>)}
-    {frame.nodes.length>0&&(canDrawNodes(frame)?<NodeScene frame={frame}/>:<div className="user-complex"><span>Узлы показаны как данные: структура не подходит для схемы.</span><pre>{JSON.stringify(frame.nodes,null,2)}</pre></div>)}
+    {frame.nodes.length>0&&(canDrawNodes(frame)?<NodeScene frame={frame}/>:<div className="user-complex"><span>{t("Узлы показаны как данные: структура не подходит для схемы.")}</span><pre>{JSON.stringify(frame.nodes,null,2)}</pre></div>)}
     <div className="user-scalars">{entries.filter(([,value])=>value===null||typeof value==='number'||typeof value==='boolean').map(([name,value])=><div className="scalar-card" key={name}><span>{name}</span><strong>{pretty(value)}</strong></div>)}</div>
     {entries.filter(([,value])=>isRef(value)).map(([name,value])=><div className="scalar-inline" key={name}><code>{name}</code><strong>{pretty(value)}</strong></div>)}
-    {!entries.length&&<p className="empty-data">Переменные появятся по мере выполнения.</p>}
-    {frame.calls.length>0&&<div className="call-stack"><span>Вызовы</span>{frame.calls.map((call,i)=><code key={i}>{call.name}:{call.line}</code>)}</div>}
+    {!entries.length&&<p className="empty-data">{t("Переменные появятся по мере выполнения.")}</p>}
+    {frame.calls.length>0&&<div className="call-stack"><span>{t("Вызовы")}</span>{frame.calls.map((call,i)=><code key={i}>{call.name}:{call.line}</code>)}</div>}
   </div>;
 }

@@ -10,7 +10,7 @@ def linked_loop(a, pos):
     slow = fast = head
     while fast and fast.next:
         slow, fast = slow.next, fast.next.next
-        if slow is fast:  # Оба указателя оказались в одном узле цикла.
+        if slow is fast:  # Both pointers refer to the same node inside the cycle.
             return True
     return False
 
@@ -36,5 +36,5 @@ def happy_number(n):
     while True:
         slow = advance(slow)
         fast = advance(advance(fast))
-        if slow == fast:  # Встреча произошла либо в 1, либо в повторяющемся цикле.
+        if slow == fast:  # They meet either at 1 or in a repeating cycle.
             return slow == 1

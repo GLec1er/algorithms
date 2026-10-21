@@ -1,83 +1,112 @@
-# Algorithms in Motion · Coding Patterns Lab
+# Algorithms Lab
 
-Интерактивный спутник **Coding Interview Patterns** Alex Xu и Shaun Gunawardane.
+**Step through coding interview patterns in Python.**
 
-**Открыть сайт: https://glec1er.github.io/algorithms/**
+Explore **101 Python interview problems** through step-by-step execution visualizations, **19 pattern guides** and **404 verified examples**. English by default, with a complete Russian option.
 
-19 глав, 101 задача, 404 подготовленных примера. Русские объяснения, исходные английские названия, оригинальные Python-решения и визуализации фактического выполнения кода.
+**[Try the live demo →](https://glec1er.github.io/algorithms/)** · [Start with binary search](https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index) · [Русский README](README.ru.md)
 
-## Возможности
+[![Algorithms Lab home: a live binary-search example beside the pattern library entry point](docs/media/home.png)](https://glec1er.github.io/algorithms/)
 
-- Массивы, указатели, окна, хеш-таблицы, списки, деревья, trie, графы, кучи, интервалы, DP, перебор, биты и геометрия.
-- Пауза, шаг назад/вперёд, скорость, сброс и шкала шагов.
-- Подсветка выполняемой строки, переменные, узлы с постоянными идентификаторами и стек вызовов.
-- Режим «Моё решение»: редактор Python, запуск на примерах и пошаговый просмотр собственного выполнения.
-- Поиск по двум языкам, фильтр сложности, ссылки на задачи, локальные отметки прогресса.
-- Календарь практики: одна новая задача в каждый будний день, XP, уровни, серии и достижения.
-- Подробные разборы всех 19 паттернов: распознавание, шаги решения, мини-пример и ошибки.
-- Мобильная версия, управление клавиатурой и поддержка reduced motion.
+- **See what every line changes.** Arrays, pointers, linked nodes, trees, graphs, heaps, DP tables, a call stack and local variables stay connected to the displayed Python.
+- **Run your own solution.** Edit Python, check the four examples and replay its actual variables and calls.
+- **Learn the reasoning.** Each pattern includes recognition signals, an invariant, a worked example, comparisons and common mistakes.
+- **Build a practice habit.** Track understood problems, weekday goals, XP and streaks locally. Export a JSON backup to keep or transfer your history.
+- **Make the workspace yours.** Choose light, dark or system appearance. Py, an optional robot-python companion, reacts to the trace; pause its motion or hide it from Appearance. Reduced motion is respected. [How Py works](docs/mascot.md).
 
-## Календарь и цель
+No account or server required. No analytics. MIT licensed.
 
-Откройте «Календарь» в шапке. Новая задача засчитывается при первом нажатии «Отметить»; повторное переключение отметки не приносит XP. Цель — минимум одна новая задача с понедельника по пятницу. Выходные добровольные и не прерывают серию. После прохождения всех задач обязательные цели прекращаются.
+## Try a one-minute walkthrough
 
-Каждая новая задача даёт 100 XP, следующий уровень — через 500 XP. Старые отметки переносятся без вымышленных дат. Снятие отметки для повторного разбора сохраняет историю первого закрытия. Прогресс хранится только в этом браузере; очистка его данных удалит историю. При недоступном хранилище текущая вкладка продолжает работать с предупреждением.
+1. Open [Find the insertion index](https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index): find where `2` belongs in `[1, 3, 5, 6]`.
+2. Press **→** to step or **Space** to play. Follow `left`, `mid` and `right` beside the Python code; the final answer is index `1`. Each highlighted line shows the state **before** it runs.
+3. Choose another **Example**, open the **Binary Search** pattern guide below the player, or switch **EN / RU** without losing your place.
 
-## Локальный запуск
+![Binary search walkthrough: pointers, Python code and recorded execution state](docs/media/binary-search.gif)
 
-Нужны Node.js 24+ (в CI используется 24), npm и Python 3.10+ без сторонних Python-пакетов.
+## Explore
 
-```bash
+| Pattern | Example |
+| --- | --- |
+| Binary search | [Find the insertion index](https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index) |
+| Two pointers | [Pair sum in a sorted array](https://glec1er.github.io/algorithms/?lang=en#/problem/pair_sum_sorted) |
+| Linked lists | [Reverse a list](https://glec1er.github.io/algorithms/?lang=en#/problem/linked_reversal) |
+| Graphs | [Shortest weighted paths](https://glec1er.github.io/algorithms/?lang=en#/problem/shortest_path) |
+| Dynamic programming | [Longest common subsequence](https://glec1er.github.io/algorithms/?lang=en#/problem/lcs) |
+
+The full catalog also covers hash maps and sets, fast/slow pointers, sliding windows, stacks, heaps, intervals, prefix sums, trees, tries, backtracking, greedy algorithms, sorting/selection, bit manipulation, math and geometry.
+
+## How it works
+
+Python runs **at build time**. The compiler records actual line events and checks each example against its independently specified expected answer. Reference mode replays these prepared traces. My solution mode executes your Python in a Pyodide module worker, with a fresh interpreter per example. Custom input editing is not supported.
+
+A highlighted line shows the state **before** that line runs. The final frame contains the returned result. Node IDs preserve reference identity, and array identities make rearrangements easier to follow. Example preparation and rendering are separate from the displayed algorithm complexity.
+
+Use the English/Russian selector at any time; it preserves your current example, frame and progress. Shared links can specify `?lang=en` or `?lang=ru` before the hash route. A fresh visit defaults to English regardless of browser language.
+
+## Your solutions
+
+Open a problem and choose **My solution**. Keep the function name and parameters, then write your code or copy the reference. Run one or all four examples; inspect actual locals, calls, output, expected answers and partial traces before errors. Unsupported structures appear as data. The displayed complexity belongs to the reference, not an automatic analysis of your code.
+
+Drafts are stored locally per problem. Editing disables stale replay until the next run. Runs do not award XP or mark a problem understood. Pyodide 314.0.7 loads on demand from jsDelivr, so first use needs network access. Initialization allows 60 seconds; each example allows 10 seconds and 1800 trace frames, with bounded state/output and a Stop button. Third-party package installation is outside this feature.
+
+## Run locally
+
+Requires **Node.js 24+**, npm and **Python 3.10+**. Python uses only the standard library.
+
+```sh
 npm ci
 npm run dev
 ```
 
-Откройте адрес, напечатанный Vite, с путём `/algorithms/`.
+Open the Vite address with the `/algorithms/` path.
 
-```bash
-npm test                 # Python-решения, инварианты и трассировщик
-npm run build            # генерация занятий, TypeScript и production-сборка
-npm run check            # генерация занятий, Python и проверка типов
-npm run preview          # просмотр dist на порту 4173
-npm run test:browser     # все занятия и управление в Chrome
-npm run test:solutions   # редактор, черновики, запуск/остановка, ошибки и повторный запуск
-npm run test:runner      # все 404 эталонных примера в настоящем Pyodide
+```sh
+npm test              # Python algorithms/traces/translations; Node progress/locale/backup tests
+npm run check         # Generate lessons, run unit checks and check TypeScript
+npm run build         # Verify examples, check types and build dist/
+npm run preview       # Serve the production build on port 4173
+npm run test:browser  # Run with the preview server running
+npm run test:solutions # Own solution editor, drafts, execution and recovery
+npm run test:runner    # All 404 examples in real Pyodide
 ```
 
-Для браузерной проверки локально используется установленный Google Chrome. В CI используется Chromium из Playwright (`CI=true`, предварительно `npx playwright install --with-deps chromium`).
+Local browser tests use installed Google Chrome. CI uses Playwright Chromium: install it with `npx playwright install --with-deps chromium`, then run tests with `CI=true`. Set `LAB_URL` to test a different preview URL.
 
-Проверки запускаются рядом с работающим dev/preview на порту 4173. Для другого адреса задайте `LAB_URL`; для `test:runner` на production-сборке также задайте `RUNNER_PRODUCTION=true`.
+Use `RUNNER_PRODUCTION=true` for `test:runner` against a production preview.
 
-Клавиатура: `←` и `→` меняют шаг; пробел управляет воспроизведением, когда фокус вне поля ввода или кнопки. Сфокусированные кнопки работают стандартно через пробел/Enter.
+## Controls and progress
 
-## Устройство
+- **← / →**: previous/next execution frame. **Space**: play/pause outside inputs, links and focused buttons.
+- Use the example selector, timeline and playback speed to explore different prepared cases.
+- **Mark as understood** saves a completion. The first completion of a problem earns 100 XP; reviewing or toggling it again does not award extra XP. Each 500 XP advances a level.
+- A weekday goal is one new problem from Monday through Friday. Weekends are optional and do not break streaks. Required goals end when the curriculum is completed.
+- History is stored only in this browser and origin. Clearing browser data removes it. Use **Calendar → Export progress** for backups. Imports show a validation preview, ask before replacing history and download the previous state first.
+- Earlier undated completions keep their XP without inventing historical dates. If storage is unavailable, the current tab remains usable with a warning.
 
-- `curriculum/catalog.py` — главы, объяснения, сложность, примеры с независимо заданными ожидаемыми ответами.
-- `curriculum/ch01.py` … `ch19.py` — оригинальные алгоритмы на Python.
-- `curriculum/structures.py` — адаптеры входных примеров и типы узлов. Подготовка и отображение примеров не включены в указанную сложность алгоритма.
-- `curriculum/runtime.py` — ограниченная запись фактических Python line events. Снимок показывает состояние **перед** выделенной строкой; последний снимок содержит результат.
-- `scripts/build_lessons.py` — проверка результатов и генерация `src/catalog.json`, `public/lessons/*.json`.
-- `src/components/` — визуальные сцены и подсветка кода, `src/App.tsx` — каталог и проигрыватель.
-- `tests/` — проверки алгоритмов, записи состояний и интерфейса.
+## Project structure
 
-Сайт статический. В режиме «Эталон» воспроизводятся состояния, записанные при сборке. В режиме «Моё решение» настоящий Python выполняется через Pyodide 314.0.7 в module Web Worker; каждый пример получает отдельный интерпретатор. Каждое занятие загружается отдельно. Перестановки элементов сохраняют идентичность карточек; циклические ссылки узлов кодируются через ID.
+| Path | Responsibility |
+| --- | --- |
+| `curriculum/catalog.py`, `patterns.py`, `english.py` | Original lesson content, worked examples and validated bilingual material |
+| `curriculum/ch01.py` … `ch19.py` | Executable Python solutions |
+| `curriculum/structures.py`, `runtime.py` | Example adapters and bounded state recording |
+| `scripts/build_lessons.py` | Verify 404 examples and generate the catalog and lesson payloads |
+| `src/components/`, `src/Home.tsx`, `src/App.tsx` | Visual scenes, discovery, player and practice screens |
+| `src/locale.ts`, `i18n.tsx`, `messages.json` | Explicit language selection and interface translations |
+| `src/progress.ts`, `backup.ts` | Study history, goals and strict local backup validation |
+| `tests/` | Algorithm properties, trace integrity and browser behavior checks |
 
-## Свои решения
+## Contribute
 
-Откройте задачу → «Моё решение». Сохраните имя функции и параметры из шаблона, напишите код либо нажмите «Скопировать эталон». Можно запустить выбранный пример или проверить все четыре. Плеер показывает реальные переменные, вызовы и строки вашего кода, фактический и ожидаемый ответы, вывод `print` и ошибки. Узлы неподдерживаемой формы показываются как данные. Оценка сложности задачи относится к эталону; сложность пользовательского кода автоматически не вычисляется.
+Corrections, clearer explanations, accessibility improvements and reproducible bug reports are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the curriculum workflow and checks. Please explain the user-visible problem rather than submit mechanical edits.
 
-Для первого запуска нужен доступ к среде Python на jsDelivr. Инициализация ограничена 60 секундами, вычисления — 10 секундами на пример. Доступна остановка; трасса ограничена 1800 кадрами и объёмом снимков. При ошибке до неё доступны записанные шаги. Увеличенные коллекции и вывод сокращаются с уведомлением; результат сравнивается до сокращения. Произвольные входные примеры и установка сторонних Python-пакетов пока не поддерживаются.
+## Deployment
 
-Черновик отдельный для каждой задачи и хранится в этом браузере. Правка кода отключает устаревший плеер до нового запуска. Запуск не начисляет XP и не отмечает задачу разобранной: отметка остаётся ручной.
+GitHub Pages uses `.github/workflows/pages.yml`. Pull requests run the checks without deploying. Updates to `main` publish the verified production build. The base path is `/algorithms/`; update `vite.config.ts` when deploying under another repository name. Direct hash links work on static hosting.
 
-## GitHub Pages
+## Scope and attribution
 
-В Settings → Pages выбран источник **GitHub Actions**. Workflow `pages.yml` проверяет Python, собирает сайт, проходит все задачи в браузере и публикует `dist` при обновлении `main`. Pull request запускает проверки без публикации; доступен ручной запуск. Дополнительные секреты не нужны.
+The 101-problem scope follows the [ByteByteGo coding-pattern catalog](https://bytebytego.com/exercises/coding-patterns), covering the book's problems and the authors' additional exercises. This is an independent learning companion to *Coding Interview Patterns* by Alex Xu and Shaun Gunawardane, not an official ByteByteGo product.
 
-Base path — `/algorithms/`; маршруты вида `#/problem/insertion_index` работают при прямом открытии. Для другого имени репозитория измените `base` в `vite.config.ts`.
-
-## Материалы
-
-Порядок и состав 101 задачи сверены с [официальным каталогом ByteByteGo](https://bytebytego.com/exercises/coding-patterns), который объединяет задачи книги и дополнительные задачи авторов. Дополнительные задачи вне этого списка не заявлены как покрытые. Тексты объяснений, примеры, код и графика этого проекта написаны самостоятельно; страницы книги и оригинальные иллюстрации здесь не размещены.
-
-Это независимый учебный проект, не официальный продукт ByteByteGo. Код проекта распространяется по MIT; исходные материалы книги принадлежат их авторам.
+The explanations, examples, Python solutions and visualizations here are original project material. Book pages and original illustrations are not distributed. Project code is available under the [MIT License](LICENSE); referenced source materials belong to their respective authors.

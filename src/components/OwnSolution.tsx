@@ -1,3 +1,5 @@
+import {useLocale} from '../i18n';
+import {t} from '../locale';
 import { useEffect, useRef, useState } from 'react';
 import type { Lesson, Payload } from '../types';
 import { pretty } from '../types';
@@ -9,7 +11,8 @@ import UserScene from './UserScene';
 import Icon from './Icon';
 
 export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payload}) {
-  const starter=payload.starter??`${payload.code.split('\n')[0]}\n    raise NotImplementedError("Добавьте своё решение")\n`;
+  const {locale}=useLocale();
+  const starter=payload.starter??`${payload.code.split('\n')[0]}\n    raise NotImplementedError("Add your solution")\n`;
   const {code,setCode,stored}=useSolutionDraft(lesson.id,starter);
   const runner=useRef(new PythonRunner()),generation=useRef(0);
   const [status,setStatus]=useState<RuntimeStatus|'idle'>('idle');
@@ -34,15 +37,15 @@ export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payl
     };
     window.addEventListener('keydown',handle);return()=>window.removeEventListener('keydown',handle);
   },[step,frames.length,busy,stale]);
-  function stop(message='Запуск остановлен.') {
+  function stop(message=t("Запуск остановлен.")) {
     generation.current++;runner.current.cancel();setStatus('idle');setPlaying(false);setFailure(message);
   }
   function edit(value:string) {
-    if(busy)stop('Код изменён. Запустите новую версию.');
+    if(busy)stop(t("Код изменён. Запустите новую версию."));
     setCode(value);setPlaying(false);
   }
   function replace(value:string) {
-    if(code!==starter&&code!==value&&!window.confirm('Заменить текущий черновик? Его код будет перезаписан.'))return;
+    if(code!==starter&&code!==value&&!window.confirm(t("Заменить текущий черновик? Его код будет перезаписан.")))return;
     edit(value);
   }
   async function run(checkAll:boolean) {
@@ -59,41 +62,41 @@ export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payl
         setRuns(old=>({...old,[index]:value}));
       }
     }catch(error){
-      if(generation.current===ticket)setFailure(error instanceof Error?error.message:'Не удалось выполнить код.');
+      if(generation.current===ticket)setFailure(error instanceof Error?error.message:t("Не удалось выполнить код."));
     }finally{if(generation.current===ticket)setStatus('idle');}
   }
-  const summary=stale?'Результаты устарели':busy?status==='loading'?'Загружаем Python…':'Выполняем ваш код…':all&&Object.keys(runs).length?`${count} / ${payload.examples.length} примеров совпало`:result?result.error?'Ошибка выполнения':result.passed?'Совпало на примере':'Не совпало':'Ваше решение ещё не запускалось';
+  const summary=stale?t("Результаты устарели"):busy?status==='loading'?t("Загружаем Python…"):t("Выполняем ваш код…"):all&&Object.keys(runs).length?t('{0} / {1} примеров совпало',[count,payload.examples.length]):result?result.error?t("Ошибка выполнения"):result.passed?t("Совпало на примере"):t("Не совпало"):t("Ваше решение ещё не запускалось");
   const playable=!busy&&!stale&&frames.length>0;
-  return <section className="own-solution" aria-label="Рабочая область моего решения">
-    <div className="own-intro"><div><strong>Твой код. Твой ход решения.</strong><p>Сохрани имя функции и параметры из шаблона. Внутренние переменные и алгоритм можно менять.</p></div><span className="draft-state">{stored?'Черновик сохранён в браузере':'Черновик только в этой вкладке'}</span></div>
-    {!stored&&<p className="storage-notice" role="alert">Не удалось сохранить черновик в браузере. Скопируйте код перед закрытием вкладки.</p>}
+  return <section className="own-solution" aria-label={t("Рабочая область моего решения")}>
+    <div className="own-intro"><div><strong>{t("Твой код. Твой ход решения.")}</strong><p>{t("Сохрани имя функции и параметры из шаблона. Внутренние переменные и алгоритм можно менять.")}</p></div><span className="draft-state">{stored?t("Черновик сохранён в браузере"):t("Черновик только в этой вкладке")}</span></div>
+    {!stored&&<p className="storage-notice" role="alert">{t("Не удалось сохранить черновик в браузере. Скопируйте код перед закрытием вкладки.")}</p>}
     <div className="own-grid">
-      <section className="visual-panel own-visual" aria-label="Визуализация моего решения">
-        <header className="panel-heading"><strong>Ваш запуск</strong><span className="play-status">{playable?`${step+1} / ${frames.length}`:'Python'}</span></header>
-        <div className="example-toolbar"><label>Пример<select aria-label="Пример моего решения" value={selected} onChange={event=>{setSelected(Number(event.target.value));setStep(0);setPlaying(false);}}>{payload.examples.map((example,index)=><option value={index} key={index}>{index+1}. {example.label}</option>)}</select></label></div>
+      <section className="visual-panel own-visual" aria-label={t("Визуализация моего решения")}>
+        <header className="panel-heading"><strong>{t("Ваш запуск")}</strong><span className="play-status">{playable?`${step+1} / ${frames.length}`:'Python'}</span></header>
+        <div className="example-toolbar"><label>{t("Пример")}<select aria-label={t("Пример моего решения")} value={selected} onChange={event=>{setSelected(Number(event.target.value));setStep(0);setPlaying(false);}}>{payload.examples.map((example,index)=><option value={index} key={index}>{index+1}. {locale==='en'?example.labelEn:example.label}</option>)}</select></label></div>
         <div className="own-summary" data-testid="own-summary" role="status">{summary}</div>
-        {stale&&<p className="own-stale" data-testid="own-stale">Код изменён после запуска. Перезапустите его: старая анимация и подсветка отключены.</p>}
-        <div className="canvas own-canvas">{frame&&!stale?<UserScene frame={frame}/>:<div className="own-empty"><Icon name="play"/><strong>{stale?'Нужен новый запуск':'Здесь появится выполнение твоего кода'}</strong><p>Массивы, переменные, структуры и вызовы — из реального состояния Python.</p></div>}</div>
-        {frame&&!stale&&<div className="step-explanation"><span className="step-badge">{step+1}</span><p aria-live="polite">{frame.message}</p></div>}
-        <div className="transport"><div className="transport-buttons"><button aria-label="Моё решение: в начало" disabled={!playable||step===0} onClick={()=>move(0)}><Icon name="reset"/></button><button aria-label="Моё решение: предыдущий шаг" disabled={!playable||step===0} onClick={()=>move(step-1)}><Icon name="prev"/></button><button className="play-button" aria-label={playing?'Пауза моего решения':'Воспроизвести моё решение'} disabled={!playable} onClick={()=>{if(step===frames.length-1)setStep(0);setPlaying(value=>!value);}}><Icon name={playing?'pause':'play'}/><span>{playing?'Пауза':'Смотреть'}</span></button><button aria-label="Моё решение: следующий шаг" disabled={!playable||step===frames.length-1} onClick={()=>move(step+1)}><Icon name="next"/></button></div><label className="speed"><select aria-label="Скорость моего решения" value={speed} onChange={event=>setSpeed(Number(event.target.value))}>{[.5,1,2,4].map(value=><option key={value} value={value}>{value}×</option>)}</select></label></div>
-        <div className="timeline"><input key={`${selected}:${frames.length}`} type="range" aria-label="Шаг моего решения" disabled={!playable} min={0} max={Math.max(0,frames.length-1)} value={Math.min(step,Math.max(0,frames.length-1))} onChange={event=>move(Number(event.target.value))}/><div><span>Начало</span><span>Последний кадр</span></div></div>
+        {stale&&<p className="own-stale" data-testid="own-stale">{t("Код изменён после запуска. Перезапустите его: старая анимация и подсветка отключены.")}</p>}
+        <div className="canvas own-canvas">{frame&&!stale?<UserScene frame={frame}/>:<div className="own-empty"><Icon name="play"/><strong>{stale?t("Нужен новый запуск"):t("Здесь появится выполнение твоего кода")}</strong><p>{t("Массивы, переменные, структуры и вызовы — из реального состояния Python.")}</p></div>}</div>
+        {frame&&!stale&&<div className="step-explanation"><span className="step-badge">{step+1}</span><p aria-live="polite">{locale==='en'?frame.messageEn:frame.message}</p></div>}
+        <div className="transport"><div className="transport-buttons"><button aria-label={t("Моё решение: в начало")} disabled={!playable||step===0} onClick={()=>move(0)}><Icon name="reset"/></button><button aria-label={t("Моё решение: предыдущий шаг")} disabled={!playable||step===0} onClick={()=>move(step-1)}><Icon name="prev"/></button><button className="play-button" aria-label={playing?t("Пауза моего решения"):t("Воспроизвести моё решение")} disabled={!playable} onClick={()=>{if(step===frames.length-1)setStep(0);setPlaying(value=>!value);}}><Icon name={playing?'pause':'play'}/><span>{playing?t("Пауза"):t("Смотреть")}</span></button><button aria-label={t("Моё решение: следующий шаг")} disabled={!playable||step===frames.length-1} onClick={()=>move(step+1)}><Icon name="next"/></button></div><label className="speed"><select aria-label={t("Скорость моего решения")} value={speed} onChange={event=>setSpeed(Number(event.target.value))}>{[.5,1,2,4].map(value=><option key={value} value={value}>{value}×</option>)}</select></label></div>
+        <div className="timeline"><input key={`${selected}:${frames.length}`} type="range" aria-label={t("Шаг моего решения")} disabled={!playable} min={0} max={Math.max(0,frames.length-1)} value={Math.min(step,Math.max(0,frames.length-1))} onChange={event=>move(Number(event.target.value))}/><div><span>{t("Начало")}</span><span>{t("Последний кадр")}</span></div></div>
       </section>
-      <section className="own-editor-panel" aria-label="Редактор своего Python-кода">
+      <section className="own-editor-panel" aria-label={t("Редактор своего Python-кода")}>
         <header className="own-editor-heading"><div><span className="python-file-icon">Py</span><strong>{lesson.id}.py</strong></div><span>Python 3</span></header>
-        <div className="own-editor-tools"><button onClick={()=>replace(payload.code)}>Скопировать эталон</button><button onClick={()=>replace(starter)}>Вернуть шаблон</button></div>
+        <div className="own-editor-tools"><button onClick={()=>replace(payload.code)}>{t("Скопировать эталон")}</button><button onClick={()=>replace(starter)}>{t("Вернуть шаблон")}</button></div>
         <PythonEditor value={code} onChange={edit} line={!stale&&runSource===code?(result?.error?.line??frame?.line??undefined):undefined}/>
-        <p className="editor-help" id="editor-help">Tab — отступ · Shift+Tab — выйти из редактора. До 64 КБ кода.</p>
-        <div className="own-run-actions"><button className="own-run" disabled={busy} onClick={()=>run(false)}><Icon name="play"/>Запустить пример</button><button disabled={busy} onClick={()=>run(true)}>Проверить все примеры</button>{busy&&<button className="own-stop" onClick={()=>stop()}>Остановить</button>}</div>
-        <p className="runtime-footnote">При первом запуске загрузится Python. Вычисления идут в браузере; зависший запуск можно остановить.</p>
-        {payload.support&&<details className="own-support"><summary>Адаптеры структур данных</summary><p>Доступны через <code>from curriculum.structures import …</code></p><pre>{payload.support}</pre></details>}
+        <p className="editor-help" id="editor-help">{t("Tab — отступ · Shift+Tab — выйти из редактора. До 64 КБ кода.")}</p>
+        <div className="own-run-actions"><button className="own-run" disabled={busy} onClick={()=>run(false)}><Icon name="play"/>{t("Запустить пример")}</button><button disabled={busy} onClick={()=>run(true)}>{t("Проверить все примеры")}</button>{busy&&<button className="own-stop" onClick={()=>stop()}>{t("Остановить")}</button>}</div>
+        <p className="runtime-footnote">{t("При первом запуске загрузится Python. Вычисления идут в браузере; зависший запуск можно остановить.")}</p>
+        {payload.support&&<details className="own-support"><summary>{t("Адаптеры структур данных")}</summary><p>{t("Доступны через")}{' '}<code>from curriculum.structures import …</code></p><pre>{payload.support}</pre></details>}
       </section>
     </div>
     {failure&&<div className="own-error" role="alert">{failure}</div>}
-    {!stale&&result?.error&&<div className="own-error" role="alert"><strong>{result.error.type}{result.error.line?` · строка ${result.error.line}`:''}</strong><pre>{result.error.message}</pre>{frames.length>0&&<p>До ошибки записано кадров: {frames.length}. Их можно посмотреть в плеере.</p>}</div>}
-    {Object.keys(runs).length>0&&<section className="own-results"><header><h2>Результаты на примерах</h2><span>Совпадение на примерах не доказывает корректность на всех входах.</span></header><div className="own-result-list">{payload.examples.map((example,index)=>{
-      const run=runs[index];return <button key={index} aria-pressed={selected===index} onClick={()=>{setSelected(index);setStep(0);setPlaying(false);}} className={selected===index?'is-selected':''}><strong>{index+1}. {example.label}</strong><span className={stale?'':run?.passed?'result-ok':run?'result-bad':''}>{stale&&run?'Устарело':run?run.error?run.error.type:run.passed?'Совпало':'Не совпало':'Не запускался'}</span></button>;
+    {!stale&&result?.error&&<div className="own-error" role="alert"><strong>{result.error.type}{result.error.line?t(' · строка {0}',[result.error.line]):''}</strong><pre>{result.error.message}</pre>{frames.length>0&&<p>{t("До ошибки записано кадров:")}{' '}{frames.length}{t(". Их можно посмотреть в плеере.")}</p>}</div>}
+    {Object.keys(runs).length>0&&<section className="own-results"><header><h2>{t("Результаты на примерах")}</h2><span>{t("Совпадение на примерах не доказывает корректность на всех входах.")}</span></header><div className="own-result-list">{payload.examples.map((example,index)=>{
+      const run=runs[index];return <button key={index} aria-pressed={selected===index} onClick={()=>{setSelected(index);setStep(0);setPlaying(false);}} className={selected===index?'is-selected':''}><strong>{index+1}. {locale==='en'?example.labelEn:example.label}</strong><span className={stale?'':run?.passed?'result-ok':run?'result-bad':''}>{stale&&run?t("Устарело"):run?run.error?run.error.type:run.passed?t("Совпало"):t("Не совпало"):t("Не запускался")}</span></button>;
     })}</div></section>}
-    {!stale&&result&&<section className="own-output"><div><small>ФАКТИЧЕСКИЙ ОТВЕТ</small><pre>{result.error?'Запуск не завершён':pretty(result.result)}</pre></div><div><small>ОЖИДАЕМЫЙ ОТВЕТ</small><pre>{pretty(payload.examples[selected].expected)}</pre></div>{result.stdout&&<div className="own-stdout"><small>ВЫВОД PYTHON</small><pre>{result.stdout}</pre></div>}{result.notices.length>0&&<ul>{result.notices.map(notice=><li key={notice}>{notice}</li>)}</ul>}</section>}
-    <p className="own-progress-note">Запуски не меняют XP и календарь. Отметить задачу разобранной можно вручную ниже.</p>
+    {!stale&&result&&<section className="own-output"><div><small>{t("ФАКТИЧЕСКИЙ ОТВЕТ")}</small><pre>{result.error?t("Запуск не завершён"):pretty(result.result)}</pre></div><div><small>{t("ОЖИДАЕМЫЙ ОТВЕТ")}</small><pre>{pretty(payload.examples[selected].expected)}</pre></div>{result.stdout&&<div className="own-stdout"><small>{t("ВЫВОД PYTHON")}</small><pre>{result.stdout}</pre></div>}{result.notices.length>0&&<ul>{result.notices.map(notice=><li key={notice}>{t(notice)}</li>)}</ul>}</section>}
+    <p className="own-progress-note">{t("Запуски не меняют XP и календарь. Отметить задачу разобранной можно вручную ниже.")}</p>
   </section>;
 }

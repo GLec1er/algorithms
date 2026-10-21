@@ -9,7 +9,7 @@
     "check": "npm run lessons && npm test && tsc --noEmit",
     "build": "npm run lessons && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "python3 -m unittest discover -s tests -v && node --test tests/progress.test.mjs",
+    "test": "python3 -m unittest discover -s tests -v && node --test tests/*.test.mjs",
     "test:browser": "node tests/browser.mjs",
     "test:runner": "node tests/runner-browser.mjs --all",
     "test:solutions": "node tests/solutions-browser.mjs"

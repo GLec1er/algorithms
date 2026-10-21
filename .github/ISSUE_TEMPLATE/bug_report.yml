@@ -1,0 +1,27 @@
+name: Bug report
+description: Report a reproducible problem in a lesson or the interface.
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson or page URL
+      placeholder: https://glec1er.github.io/algorithms/?lang=en#/problem/insertion_index
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the selected example, frame, language and browser when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+      description: For algorithm results, give a small input and independently worked expected answer.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or relevant errors
+      description: Remove any personal study history before sharing files.

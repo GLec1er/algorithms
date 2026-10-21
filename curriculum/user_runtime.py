@@ -123,7 +123,7 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
         if len(structures.NODES) > 200:
             notices.add('Показаны первые 200 узлов структуры.')
         line = max(1, min(len(lines), frame.f_lineno))
-        return dict(line=line, message='Перед строкой ' + str(line) + ': ' + lines[line - 1].strip()[:240], state=state, nodes=nodes, arrays=arrays, calls=[dict(name=f.f_code.co_name, line=f.f_lineno) for f in scopes], done=False)
+        return dict(line=line, message='Перед строкой ' + str(line) + ': ' + lines[line - 1].strip()[:240], messageEn='Before line ' + str(line) + ': ' + lines[line - 1].strip()[:240], state=state, nodes=nodes, arrays=arrays, calls=[dict(name=f.f_code.co_name, line=f.f_lineno) for f in scopes], done=False)
 
     def record(frame, event, value):
         nonlocal recorded_size
@@ -138,6 +138,7 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
         item = snapshot(frame)
         if event == 'return':
             item['message'] = 'Возврат из ' + frame.f_code.co_name
+            item['messageEn'] = 'Return from ' + frame.f_code.co_name
         recorded_size += len(json.dumps(item, ensure_ascii=False))
         if recorded_size > 8_000_000:
             raise TraceLimitError('Трасса превысила допустимый объём 8 МБ.')
@@ -176,7 +177,7 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
             passed = bool(actual == expected)
         terminal = copy.deepcopy(frames[-1]) if frames else dict(line=1, state={}, nodes=[], arrays={}, calls=[])
         freeze_budget[0] = 4000
-        terminal.update(done=True, result=freeze(actual), message='Ваш код завершён. Сравните ответ с ожидаемым.', calls=[])
+        terminal.update(done=True, result=freeze(actual), message='Ваш код завершён. Сравните ответ с ожидаемым.', messageEn='Your code has finished. Compare the actual and expected answers.', calls=[])
         frames.append(terminal)
     except BaseException as exc:
         sys.settrace(previous)

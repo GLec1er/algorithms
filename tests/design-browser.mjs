@@ -1,5 +1,6 @@
 import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
+import {selectTheme,openAppearance} from './ui-controls.mjs';
 import { pathToFileURL } from 'node:url';
 
 // Catches lost theme selection, missing OS updates, progress writes and storage-denial crashes.
@@ -12,14 +13,16 @@ export async function checkDesign(browser, base) {
     await expect(page.locator('html')).toHaveAttribute('data-theme','light');
     const progress=await page.evaluate(()=>localStorage.getItem('patterns-study-v2'));
     const light=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
-    await page.getByLabel('Оформление', {exact:true}).selectOption('dark');
+    await selectTheme(page,'dark');
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
     assert.notEqual(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),light);
     assert.equal(await page.evaluate(()=>localStorage.getItem('patterns-study-v2')),progress);
     await page.reload();
-    await expect(page.getByLabel('Оформление',{exact:true})).toHaveValue('dark');
+    await openAppearance(page);
+    await expect(page.getByRole('group',{name:'Оформление',exact:true}).getByRole('radio',{name:'Тёмная',exact:true})).toBeChecked();
+    await page.keyboard.press('Escape');
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-    await page.getByLabel('Оформление',{exact:true}).selectOption('system');
+    await selectTheme(page,'system');
     await page.emulateMedia({colorScheme:'dark'});
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
     await page.emulateMedia({colorScheme:'light'});
@@ -32,7 +35,7 @@ export async function checkDesign(browser, base) {
     const page=await denied.newPage();
     await page.goto(base+'#/calendar');
     await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
-    await page.getByLabel('Оформление',{exact:true}).selectOption('light');
+    await selectTheme(page,'light');
     await expect(page.locator('html')).toHaveAttribute('data-theme','light');
     await expect(page.getByRole('alert')).toContainText('Хранилище браузера недоступно');
   } finally {await denied.close();}
@@ -50,7 +53,7 @@ export async function checkSceneContrast(browser,base) {
     const page=await context.newPage();
     for(const theme of ['light','dark']){
       await page.goto(base+'#/problem/merge_intervals');
-      await page.getByLabel('Оформление',{exact:true}).selectOption(theme);
+      await selectTheme(page,theme);
       await page.getByLabel('Шаг анимации').waitFor();
       await page.getByLabel('Шаг анимации').fill('9');
       await expect(page.getByTestId('step')).toHaveText('10');
@@ -107,7 +110,7 @@ async function checkResponsive(browser,base) {
     const page=await context.newPage();
     for(const theme of ['light','dark']){
       await page.goto(base+'#/problem/insertion_index');
-      await page.getByLabel('Оформление',{exact:true}).selectOption(theme);
+      await selectTheme(page,theme);
       for(const width of [320,390,768,1024,1440]){
         await page.setViewportSize({width,height:1000});
         for(const route of ['#/problem/insertion_index','#/calendar']){

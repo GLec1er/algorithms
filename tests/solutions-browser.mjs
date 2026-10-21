@@ -6,7 +6,7 @@ export async function checkSolutions(browser,base){
   const c=await browser.newContext();
   try{
     const p=await c.newPage();
-    await p.goto(base+'#/problem/insertion_index');
+    await p.goto(base+'?lang=ru#/problem/insertion_index');
     await p.getByRole('button',{name:'Моё решение',exact:true}).click({timeout:5000});
     const editor=p.getByRole('textbox',{name:'Python-решение',exact:true});
     assert.match(await editor.inputValue(),/NotImplementedError/);
@@ -43,10 +43,10 @@ export async function checkSolutions(browser,base){
     await editor.fill('def insertion_index(a, target):\n    return 99\n');
     p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Скопировать эталон',exact:true}).click();
     assert.match(await editor.inputValue(),/while left < right/);
-    await p.goto(base+'#/problem/first_last');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
+    await p.goto(base+'?lang=ru#/problem/first_last');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
     await expect(editor).toHaveValue(/def first_last/);
     for(const width of [320,390]){await p.setViewportSize({width,height:844});assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth)<=width+2);}
-    await p.goto(base+'#/problem/insertion_index');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
+    await p.goto(base+'?lang=ru#/problem/insertion_index');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
     await editor.fill('while True:\n    pass\n\ndef insertion_index(a, target):\n    return 1\n');
     await p.getByRole('button',{name:'Запустить пример',exact:true}).click();
     await expect(p.getByTestId('own-summary')).toContainText('Выполняем ваш код',{timeout:65000});
@@ -88,13 +88,45 @@ export async function checkSolutions(browser,base){
   }finally{await c.close();}
   await checkUnavailableStorage(browser,base);
   await checkRuntimeRetry(browser,base);
+  await checkSolutionLocales(browser,base);
+}
+
+async function checkSolutionLocales(browser,base){
+  const c=await browser.newContext();
+  try{
+    const p=await c.newPage(),errors=[];
+    p.on('pageerror',error=>errors.push(error.message));
+    await p.goto(base+'?lang=en#/problem/insertion_index');
+    await p.getByRole('button',{name:'My solution',exact:true}).click();
+    const editor=p.getByRole('textbox',{name:'Python solution',exact:true});
+    const code='def insertion_index(a, target):\n    for index, value in enumerate(a):\n        if value >= target:\n            return index\n    return len(a)\n';
+    await editor.fill(code);
+    await p.getByRole('button',{name:'Check all examples',exact:true}).click();
+    await expect(p.getByTestId('own-summary')).toHaveText('4 / 4 examples matched',{timeout:65000});
+    const slider=p.getByLabel('My solution step',{exact:true});
+    await slider.fill(await slider.getAttribute('max'));
+    await expect(p.locator('.step-explanation')).toContainText('Your code has finished');
+    assert.doesNotMatch(await p.locator('main').innerText(),/[А-Яа-яЁё]/);
+    const frame=await slider.inputValue();
+    await p.getByRole('group',{name:'Language',exact:true}).getByRole('radio',{name:'Русский',exact:true}).check();
+    await expect(p.getByRole('textbox',{name:'Python-решение',exact:true})).toHaveValue(code);
+    await expect(p.getByLabel('Шаг моего решения',{exact:true})).toHaveValue(frame);
+    await expect(p.locator('.step-explanation')).toContainText('Ваш код завершён');
+    for(const locale of ['en','ru'])for(const width of [320,390]){
+      await p.setViewportSize({width,height:844});
+      await p.goto(base+'?lang='+locale+'#/problem/insertion_index');
+      await p.getByRole('button',{name:locale==='en'?'My solution':'Моё решение',exact:true}).click();
+      assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),locale+' own solution overflow at '+width);
+    }
+    assert.deepEqual(errors,[]);
+  }finally{await c.close();}
 }
 
 async function checkRuntimeRetry(browser,base){
   const c=await browser.newContext();
   try{
     await c.route('https://cdn.jsdelivr.net/pyodide/**',route=>route.abort());
-    const p=await c.newPage();await p.goto(base+'#/problem/insertion_index');
+    const p=await c.newPage();await p.goto(base+'?lang=ru#/problem/insertion_index');
     await p.getByRole('button',{name:'Моё решение',exact:true}).click();
     const editor=p.getByRole('textbox',{name:'Python-решение',exact:true});
     await editor.fill('def insertion_index(a, target):\n    return 1\n');
@@ -111,7 +143,7 @@ async function checkUnavailableStorage(browser,base){
   const c=await browser.newContext({colorScheme:'light'});
   try{
     await c.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Denied','QuotaExceededError');};});
-    const p=await c.newPage();await p.goto(base+'#/problem/insertion_index');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
+    const p=await c.newPage();await p.goto(base+'?lang=ru#/problem/insertion_index');await p.getByRole('button',{name:'Моё решение',exact:true}).click();
     await p.getByRole('textbox',{name:'Python-решение',exact:true}).fill('def insertion_index(a, target):\n    return target\n');
     await expect(p.getByRole('alert')).toContainText('Не удалось сохранить черновик');
     await p.getByRole('button',{name:'Эталон',exact:true}).click();await p.getByLabel('Шаг анимации',{exact:true}).waitFor();

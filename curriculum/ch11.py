@@ -20,7 +20,7 @@ def balanced_tree(a):
         left = height(node.left)
         right = height(node.right)
         if left < 0 or right < 0 or abs(left - right) > 1:
-            return -1  # Сигнал нарушения распространяется к корню.
+            return -1  # Propagate the imbalance signal toward the root.
         return 1 + max(left, right)
     return height(root) >= 0
 
@@ -39,7 +39,7 @@ def rightmost_nodes(a):
             if node.right:
                 queue.append(node.right)
             if i == width - 1:
-                result.append(node.value)  # Последний узел текущего уровня виден справа.
+                result.append(node.value)  # The final node at this level is visible from the right.
     return result
 
 
@@ -54,7 +54,7 @@ def widest_level(a):
         best = max(best, last - first + 1)
         for i in range(len(queue)):
             node, position = queue.popleft()
-            position -= first  # Нормализация не меняет ширину и ограничивает рост индексов.
+            position -= first  # Normalization preserves width while limiting index growth.
             if node.left:
                 queue.append((node.left, 2 * position))
             if node.right:
@@ -83,7 +83,7 @@ def lowest_ancestor(a, p, q):
         left = visit(node.left)
         right = visit(node.right)
         if left and right:
-            return node  # Цели расположены в разных поддеревьях.
+            return node  # The targets occur in different child subtrees.
         return left or right
     answer = visit(root)
     return answer.value
@@ -117,8 +117,8 @@ def maximum_tree_path(a):
             return 0
         left = max(0, gain(node.left))
         right = max(0, gain(node.right))
-        best = max(best, node.value + left + right)  # Путь через узел может соединить обе ветви.
-        return node.value + max(left, right)  # Родителю разрешено продолжить только одну ветвь.
+        best = max(best, node.value + left + right)  # A path through this node may join both branches.
+        return node.value + max(left, right)  # Only one branch may continue toward the parent.
     gain(root)
     return best
 
