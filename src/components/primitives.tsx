@@ -29,10 +29,10 @@ export function ArrayRow({name, values, frame, pointers=false, halfOpen=false}:{
   </div>;
 }
 
-export function Grid({name, value, frame, infection=false}:{name:string;value:Value;frame:Frame;infection?:boolean}) {
+export function Grid({name, value, frame, infection=false, highlight=true}:{name:string;value:Value;frame:Frame;infection?:boolean;highlight?:boolean}) {
   const rows=asArray(value).map(row=>typeof row==='string'?[...row]:asArray(row));
-  const r=Number(frame.state.r ?? frame.state.left ?? -1), c=Number(frame.state.c ?? frame.state.right ?? -1);
-  const visited=asArray(frame.state.visited);
+  const r=highlight?Number(frame.state.r ?? frame.state.left ?? -1):-1, c=highlight?Number(frame.state.c ?? frame.state.right ?? -1):-1;
+  const visited=highlight?asArray(frame.state.visited):[];
   return <div className="grid-block"><div className="data-label"><span>{name}</span><small>{rows.length} × {rows[0]?.length??0}</small></div>
     <div className="scene-scroll"><div className="matrix" style={{'--cols':rows[0]?.length??1} as CSSProperties}>
       {rows.flatMap((row,ri)=>row.map((v,ci)=>{

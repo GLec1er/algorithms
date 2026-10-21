@@ -25,9 +25,14 @@ def build():
             assert all(1 <= f['line'] <= len(payload['code'].splitlines()) for f in frames)
             examples += 1
             states += len(frames)
+        payload['starter'] = payload['code'].splitlines()[0] + '\n    # Напишите своё решение здесь.\n    raise NotImplementedError(\"Добавьте своё решение\")\n'
         (target / f"{lesson['id']}.json").write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':'), allow_nan=False) + '\n')
     catalog = dict(chapters=CHAPTERS, lessons=[{k:v for k,v in p.items() if k != 'examples'} for p in LESSONS], stats=dict(chapters=19, lessons=101, examples=examples, states=states))
     (ROOT / 'src' / 'catalog.json').write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + '\n')
+    runtime = ROOT / 'public' / 'runtime'
+    runtime.mkdir(parents=True, exist_ok=True)
+    for name in ('structures.py', 'user_runtime.py'):
+        (runtime / name).write_text((ROOT / 'curriculum' / name).read_text())
     print(f'Compiled 19 chapters, 101 lessons, {examples} checked examples, {states} Python states.')
 
 

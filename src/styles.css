@@ -1,5 +1,6 @@
 @import './styles/tokens.css';
 @import './styles/scenes.css';
+@import './styles/solutions.css';
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }

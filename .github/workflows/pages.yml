@@ -47,6 +47,8 @@ jobs:
             sleep 1
           done
           npm run test:browser
+          npm run test:solutions
+          RUNNER_PRODUCTION=true npm run test:runner
       - uses: actions/upload-pages-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
