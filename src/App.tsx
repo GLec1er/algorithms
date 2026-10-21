@@ -8,6 +8,7 @@ import type { Chapter, Lesson, Payload, Value } from './types';
 import { pretty, isRef } from './types';
 import Scene from './components/Scene';
 import Code from './components/Code';
+import OwnSolution from './components/OwnSolution';
 import { PatternGlyph } from './components/PatternGlyph';
 import PatternGuide from './components/PatternGuide';
 import PracticeCalendar from './components/PracticeCalendar';
@@ -22,6 +23,10 @@ const safeWrite=(key:string,value:string)=>{try{localStorage.setItem(key,value);
 const route=()=>location.hash==='#/calendar'?'calendar':location.hash.startsWith('#/problem/')?decodeURIComponent(location.hash.slice(10)):location.hash&&location.hash!=='#/'?'unknown':'home';
 
 
+function Completion({completed,toggle}:{completed:boolean;toggle:()=>void}) {
+  return <section className="lesson-completion"><div><strong>{t("Разобрался с задачей?")}</strong><p>{t("Отметь её, чтобы сохранить свой прогресс.")}</p></div><button className={`complete-button ${completed?'is-complete':''}`} aria-label={completed?t("Убрать отметку"):t("Отметить как разобранное")} onClick={toggle}><Icon name="check"/><span>{completed?t("Разобрано"):t("Задача разобрана")}</span></button></section>;
+}
+
 function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggle:()=>void}) {
   const {locale}=useLocale();
   const chapters=(locale==='en'?data.english.chapters:data.chapters) as Chapter[], lessons=(locale==='en'?data.english.lessons:data.lessons) as Lesson[];
@@ -29,6 +34,7 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
   const [payload,setPayload]=useState<Payload|null>(null),[error,setError]=useState('');
   const [exampleIndex,setExampleIndex]=useState(0),[step,setStep]=useState(0),[playing,setPlaying]=useState(false),[speed,setSpeed]=useState(1);
   const [variablesOpen,setVariablesOpen]=useState(true);
+  const [mode,setMode]=useState<'reference'|'own'>('reference');
   useEffect(()=>{
     const controller=new AbortController();
     fetch(`${import.meta.env.BASE_URL}lessons/${lesson.id}.json`,{signal:controller.signal}).then(r=>{if(!r.ok)throw new Error(t("Не удалось загрузить занятие"));return r.json();}).then(p=>setPayload(p)).catch(e=>{if(e.name!=='AbortError')setError('Не удалось загрузить занятие. Проверьте соединение и попробуйте снова.');});
@@ -43,23 +49,25 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
   },[playing,step,frames.length,speed]);
   const move=(next:number)=>{setPlaying(false);setStep(Math.max(0,Math.min(frames.length-1,next)));};
   useEffect(()=>{
+    if(mode==='own')return;
     const handle=(e:KeyboardEvent)=>{
       if((e.target as HTMLElement).closest('input,select,textarea,a,dialog'))return;
       if(e.key==='ArrowRight'){e.preventDefault();move(step+1);}
       if(e.key==='ArrowLeft'){e.preventDefault();move(step-1);}
       if(e.key===' '&&!(e.target as HTMLElement).closest('button')){e.preventDefault();setPlaying(p=>!p);}
     };window.addEventListener('keydown',handle);return()=>window.removeEventListener('keydown',handle);
-  },[step,frames.length]);
+  },[step,frames.length,mode]);
   const index=lessons.findIndex(l=>l.id===lesson.id);
   const scalarEntries=frame?Object.entries(frame.state).filter(([,v])=>isRef(v)||(!Array.isArray(v)&&!(v&&typeof v==='object'))):[];
   return <article className="lesson-content">
     <div className="breadcrumb"><a href="#/problem/pair_sum_sorted">{t("Библиотека паттернов")}</a><span>/</span><span>{chapter.ru}</span></div>
     <div className="companion-intro lesson-intro"><div className="lesson-intro-copy">
     <div className="lesson-heading"><span className="chapter-badge" aria-hidden="true">{lesson.chapter}</span><div><div className="eyebrow">{t("Глава")}{' '}{lesson.chapter} · {chapter.title}</div><h1>{lesson.ru}</h1>{locale==='ru'&&<p className="original-title">{lesson.title}</p>}</div></div>
-    <div className="lesson-meta"><span className={`difficulty ${lesson.difficulty.toLowerCase()}`}><span className="difficulty-bars" aria-hidden="true"><i/><i/><i/></span>{t(levels[lesson.difficulty])}</span><span className="complexity-chip"><span>{t("Время")}</span> {lesson.time}</span><span className="language-chip"><b>Py</b> Python 3</span><span className="lesson-position">{lessons.filter(l=>l.chapter===lesson.chapter).findIndex(l=>l.id===lesson.id)+1} / {lessons.filter(l=>l.chapter===lesson.chapter).length}{' '}{t("в главе")}</span></div>
+    <div className="lesson-meta"><span className={`difficulty ${lesson.difficulty.toLowerCase()}`}><span className="difficulty-bars" aria-hidden="true"><i/><i/><i/></span>{t(levels[lesson.difficulty])}</span><span className="complexity-chip">{mode==='own'?t("Эталон: "):<span>{t("Время")} </span>}{lesson.time}</span><span className="language-chip"><b>Py</b> Python 3</span><span className="lesson-position">{lessons.filter(l=>l.chapter===lesson.chapter).findIndex(l=>l.id===lesson.id)+1} / {lessons.filter(l=>l.chapter===lesson.chapter).length}{' '}{t("в главе")}</span></div>
     <div className="problem-brief"><span className="brief-label">{t("УСЛОВИЕ")}<span>↳</span></span><p className="statement">{lesson.statement}</p></div>
     </div><PyMascot mode={frame?.done?'complete':playing?'playing':'paused'} stepToken={`${exampleIndex}/${step}`}/></div>
-    {error?<div className="error-card" role="alert"><p>{t(error)}</p><button onClick={()=>location.reload()}>{t("Повторить загрузку")}</button></div>:!payload||!frame||!example?<div className="loading-card"><span className="loading-spinner"/>{t("Готовим визуализацию…")}</div>:<>
+    <div className="solution-modes" role="group" aria-label={t("Режим решения")}><button aria-pressed={mode==='reference'} onClick={()=>{setPlaying(false);setMode('reference');}}>{t("Эталон")}</button><button aria-pressed={mode==='own'} onClick={()=>{setPlaying(false);setMode('own');}}>{t("Моё решение")}</button><span>{mode==='reference'?t("Готовое решение с объяснениями"):t("Напиши свой код и посмотри его выполнение")}</span></div>
+    {error?<div className="error-card" role="alert"><p>{t(error)}</p><button onClick={()=>location.reload()}>{t("Повторить загрузку")}</button></div>:!payload||!frame||!example?<div className="loading-card"><span className="loading-spinner"/>{t("Готовим визуализацию…")}</div>:mode==='own'?<><OwnSolution key={lesson.id} lesson={lesson} payload={payload}/><PatternGuide chapter={chapter} lessons={lessons} current={lesson.id}/><Completion completed={completed} toggle={toggle}/><ShareLesson/></>:<>
       <div className="workspace-grid">
         <section className="visual-panel" aria-label={t("Визуализация алгоритма")}><header className="panel-heading"><div><span className="panel-number">01</span><strong>{t("Визуализация")}</strong></div><div className="panel-companion"><span className={`play-status ${playing?'playing':''}`}><i/>{frame.done?t("Завершено"):playing?t("В движении"):t("На паузе")}</span></div></header>
           <div className="example-toolbar"><label>{t("Пример")}<select aria-label={t("Пример")} value={exampleIndex} onChange={e=>{setPlaying(false);setStep(0);setExampleIndex(Number(e.target.value));}}>{payload.examples.map((ex,i)=><option key={i} value={i}>{locale==='en'?ex.labelEn:ex.label}</option>)}</select></label><div className="input-chips">{Object.entries(example.args).filter(([,v])=>!Array.isArray(v)&&typeof v!=='object').slice(0,3).map(([k,v])=><span key={k}><code>{k}</code> = <strong>{pretty(v)}</strong></span>)}</div></div>
@@ -74,7 +82,7 @@ function Player({lesson,completed,toggle}:{lesson:Lesson;completed:boolean;toggl
       <section className={`result-strip ${frame.done?'done':''}`}><div><span className="result-icon">{frame.done?'✓':'→'}</span><div><small>{frame.done?t("РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ"):t("ОЖИДАЕМЫЙ ОТВЕТ")}</small><code>{pretty(frame.done?frame.result:example.expected)}</code></div></div>{frame.done&&<span className="result-match">{JSON.stringify(frame.result)===JSON.stringify(example.expected)?t("Результат совпадает"):t("Проверьте результат")}</span>}<details><summary>{t("Входные данные")}</summary><pre>{JSON.stringify(example.args,null,2)}</pre></details></section>
     <PatternGuide chapter={chapter} lessons={lessons} current={lesson.id}/>
       <div className="learning-notes"><section><div className="note-icon">{'{ }'}</div><div><h2>{t("Почему это работает")}</h2><p>{lesson.idea}</p><p className="invariant"><strong>{t("Инвариант.")}</strong> {chapter.invariant}</p></div></section><section><div className="note-icon">!</div><div><h2>{t("На что обратить внимание")}</h2><p>{chapter.pitfall}</p><div className="complexity"><span>{t("Время")}<strong>{lesson.time}</strong></span><span>{t("Память")}<strong>{lesson.space}</strong></span></div></div></section></div>
-      <section className="lesson-completion"><div><strong>{t("Разобрался с задачей?")}</strong><p>{t("Отметь её, чтобы сохранить свой прогресс.")}</p></div><button className={`complete-button ${completed?'is-complete':''}`} aria-label={completed?t("Убрать отметку"):t("Отметить как разобранное")} onClick={toggle}><Icon name="check"/><span>{completed?t("Разобрано"):t("Задача разобрана")}</span></button></section>
+      <Completion completed={completed} toggle={toggle}/>
       <ShareLesson/><div className="lesson-footer"><a href={lesson.source} target="_blank" rel="noreferrer">{t("Задачи и книга · ByteByteGo ↗")}</a><span>{t("← → по шагам · пробел — пауза")}</span></div>
       <nav className="lesson-pagination" aria-label={t("Следующая задача")}>{index>0?<a href={`#/problem/${lessons[index-1].id}`}><small>{t("← ПРЕДЫДУЩАЯ")}</small><strong>{lessons[index-1].ru}</strong></a>:<div/>}{index<lessons.length-1&&<a href={`#/problem/${lessons[index+1].id}`}><small>{t("СЛЕДУЮЩАЯ →")}</small><strong>{lessons[index+1].ru}</strong></a>}</nav>
     </>}

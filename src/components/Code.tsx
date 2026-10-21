@@ -1,7 +1,7 @@
 import { t } from '../locale';
 import { useEffect, useRef, useState } from 'react';
 
-function Syntax({text}:{text:string}) {
+export function Syntax({text}:{text:string}) {
   return <>{text.split(/(#.*$|'[^']*'|"[^"]*"|\b(?:def|return|if|elif|else|for|while|in|not|and|or|is|None|True|False|from|import|as|nonlocal|continue|break|class|lambda)\b|\b\d+\b)/g).map((part,i)=>{
     const cls=part.startsWith('#')?'comment':/^['"]/.test(part)?'string':/^\d+$/.test(part)?'number':/^(def|return|if|elif|else|for|while|in|not|and|or|is|None|True|False|from|import|as|nonlocal|continue|break|class|lambda)$/.test(part)?'keyword':'';
     return cls?<span className={`syntax-${cls}`} key={i}>{part}</span>:part;

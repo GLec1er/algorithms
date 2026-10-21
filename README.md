@@ -9,6 +9,7 @@ Explore **101 Python interview problems** through step-by-step execution visuali
 [![Algorithms Lab home: a live binary-search example beside the pattern library entry point](docs/media/home.png)](https://glec1er.github.io/algorithms/)
 
 - **See what every line changes.** Arrays, pointers, linked nodes, trees, graphs, heaps, DP tables, a call stack and local variables stay connected to the displayed Python.
+- **Run your own solution.** Edit Python, check the four examples and replay its actual variables and calls.
 - **Learn the reasoning.** Each pattern includes recognition signals, an invariant, a worked example, comparisons and common mistakes.
 - **Build a practice habit.** Track understood problems, weekday goals, XP and streaks locally. Export a JSON backup to keep or transfer your history.
 - **Make the workspace yours.** Choose light, dark or system appearance. Py, an optional robot-python companion, reacts to the trace; pause its motion or hide it from Appearance. Reduced motion is respected. [How Py works](docs/mascot.md).
@@ -37,11 +38,17 @@ The full catalog also covers hash maps and sets, fast/slow pointers, sliding win
 
 ## How it works
 
-Python runs **at build time**. The compiler records actual line events and checks each example against its independently specified expected answer. The static website replays these prepared traces; it does **not** execute arbitrary Python or accept custom inputs.
+Python runs **at build time**. The compiler records actual line events and checks each example against its independently specified expected answer. Reference mode replays these prepared traces. My solution mode executes your Python in a Pyodide module worker, with a fresh interpreter per example. Custom input editing is not supported.
 
 A highlighted line shows the state **before** that line runs. The final frame contains the returned result. Node IDs preserve reference identity, and array identities make rearrangements easier to follow. Example preparation and rendering are separate from the displayed algorithm complexity.
 
 Use the English/Russian selector at any time; it preserves your current example, frame and progress. Shared links can specify `?lang=en` or `?lang=ru` before the hash route. A fresh visit defaults to English regardless of browser language.
+
+## Your solutions
+
+Open a problem and choose **My solution**. Keep the function name and parameters, then write your code or copy the reference. Run one or all four examples; inspect actual locals, calls, output, expected answers and partial traces before errors. Unsupported structures appear as data. The displayed complexity belongs to the reference, not an automatic analysis of your code.
+
+Drafts are stored locally per problem. Editing disables stale replay until the next run. Runs do not award XP or mark a problem understood. Pyodide 314.0.7 loads on demand from jsDelivr, so first use needs network access. Initialization allows 60 seconds; each example allows 10 seconds and 1800 trace frames, with bounded state/output and a Stop button. Third-party package installation is outside this feature.
 
 ## Run locally
 
@@ -60,9 +67,13 @@ npm run check         # Generate lessons, run unit checks and check TypeScript
 npm run build         # Verify examples, check types and build dist/
 npm run preview       # Serve the production build on port 4173
 npm run test:browser  # Run with the preview server running
+npm run test:solutions # Own solution editor, drafts, execution and recovery
+npm run test:runner    # All 404 examples in real Pyodide
 ```
 
 Local browser tests use installed Google Chrome. CI uses Playwright Chromium: install it with `npx playwright install --with-deps chromium`, then run tests with `CI=true`. Set `LAB_URL` to test a different preview URL.
+
+Use `RUNNER_PRODUCTION=true` for `test:runner` against a production preview.
 
 ## Controls and progress
 
