@@ -99,10 +99,12 @@ async function checkSolutionLocales(browser,base){
     await p.goto(base+'?lang=en#/problem/insertion_index');
     await p.getByRole('button',{name:'My solution',exact:true}).click();
     const editor=p.getByRole('textbox',{name:'Python solution',exact:true});
-    const code='def insertion_index(a, target):\n    for index, value in enumerate(a):\n        if value >= target:\n            return index\n    return len(a)\n';
+    const code='def insertion_index(values, needle):\n    for index, value in enumerate(values):\n        if value >= needle:\n            return index\n    return len(values)\n';
     await editor.fill(code);
     await p.getByRole('button',{name:'Check all examples',exact:true}).click();
     await expect(p.getByTestId('own-summary')).toHaveText('4 / 4 examples matched',{timeout:65000});
+    await expect(p.getByTestId('argument-binding')).toContainText('a → values, target → needle');
+    await expect(editor).toHaveValue(code);
     const slider=p.getByLabel('My solution step',{exact:true});
     await slider.fill(await slider.getAttribute('max'));
     await expect(p.locator('.step-explanation')).toContainText('Your code has finished');

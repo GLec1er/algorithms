@@ -46,7 +46,7 @@ Use the English/Russian selector at any time; it preserves your current example,
 
 ## Your solutions
 
-Open a problem and choose **My solution**. Keep the function name and parameters, then write your code or copy the reference. Run one or all four examples; inspect actual locals, calls, output, expected answers and partial traces before errors. Unsupported structures appear as data. The displayed complexity belongs to the reference, not an automatic analysis of your code.
+Open a problem and choose **My solution**. Keep the function name and input parameter order, then write your code or copy the reference. Parameter names can differ: matching names use keyword binding; otherwise inputs are passed positionally in template order, with the mapping shown beside the replay. The submitted code is not rewritten. Run one or all four examples; inspect actual locals, calls, output, expected answers and partial traces before errors. Unsupported structures appear as data. The displayed complexity belongs to the reference, not an automatic analysis of your code.
 
 Drafts are stored locally per problem. Editing disables stale replay until the next run. Runs do not award XP or mark a problem understood. Pyodide 314.0.7 loads on demand from jsDelivr, so first use needs network access. Initialization allows 60 seconds; each example allows 10 seconds and 1800 trace frames, with bounded state/output and a Stop button. Third-party package installation is outside this feature.
 

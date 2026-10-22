@@ -31,7 +31,44 @@ class UserRuntimeTests(unittest.TestCase):
     def test_bad_source_and_contract(self):
         self.assertEqual(self.run_code('def solve(:')['error']['type'], 'SyntaxError')
         self.assertEqual(self.run_code('x = 1')['error']['type'], 'NameError')
-        self.assertEqual(self.run_code('def solve(other): return other', {'value': 1})['error']['type'], 'TypeError')
+        self.assertEqual(self.run_code('def solve(first, second): return first', {'value': 1})['error']['type'], 'TypeError')
+
+    def test_renamed_parameters_keep_source_and_real_locals(self):
+        result = self.run_code('def solve(heights, amount):\n    return sum(heights) + amount\n', {'a': [2, 3], 'k': 7}, 12)
+        self.assertTrue(result['passed'], result['error'])
+        self.assertEqual(result['bindings'], [{'input': 'a', 'parameter': 'heights'}, {'input': 'k', 'parameter': 'amount'}])
+        self.assertTrue(any(frame['state'].get('heights') == [2, 3] for frame in result['frames']))
+        self.assertTrue(all(frame['line'] in (1, 2) for frame in result['frames']))
+
+    def test_matching_names_preserve_reordered_signature(self):
+        result = self.run_code('def solve(k, a):\n    return sum(a) + k\n', {'a': [2, 3], 'k': 7}, 12)
+        self.assertTrue(result['passed'], result['error'])
+        self.assertEqual(result['bindings'], [])
+
+    def test_binding_supports_defaults_positional_only_and_varargs(self):
+        for source, args, expected in [
+            ('def solve(values, bonus=10): return sum(values) + bonus', {'a': [2, 3]}, 15),
+            ('def solve(values, /): return sum(values)', {'a': [2, 3]}, 5),
+            ('def solve(*values): return sum(values)', {'a': 2, 'k': 3}, 5),
+        ]:
+            with self.subTest(source=source):
+                result = self.run_code(source, args, expected)
+                self.assertTrue(result['passed'], result['error'])
+
+    def test_runtime_type_error_is_not_retried_as_an_argument_error(self):
+        result = self.run_code('def solve(values):\n    print("once")\n    raise TypeError("inside body")\n', {'a': [1]})
+        self.assertEqual(result['error']['type'], 'TypeError')
+        self.assertEqual(result['error']['message'], 'inside body')
+        self.assertEqual(result['error']['line'], 3)
+        self.assertEqual(result['stdout'], 'once\n')
+
+    def test_all_404_inputs_have_template_parameter_order(self):
+        from curriculum.catalog import LESSONS
+        for lesson in LESSONS:
+            function = getattr(importlib.import_module(f"curriculum.ch{lesson['chapter']:02}"), lesson['id'])
+            parameters = list(inspect.signature(function).parameters)
+            for example in lesson['examples']:
+                self.assertEqual(list(example['args']), parameters, lesson['id'])
 
     def test_limit_preserves_partial_trace_and_never_passes(self):
         result = self.run_code('def solve():\n    while True:\n        pass\n', frame_limit=12)
