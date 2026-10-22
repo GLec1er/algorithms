@@ -68,13 +68,14 @@ export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payl
   const summary=stale?t("Результаты устарели"):busy?status==='loading'?t("Загружаем Python…"):t("Выполняем ваш код…"):all&&Object.keys(runs).length?t('{0} / {1} примеров совпало',[count,payload.examples.length]):result?result.error?t("Ошибка выполнения"):result.passed?t("Совпало на примере"):t("Не совпало"):t("Ваше решение ещё не запускалось");
   const playable=!busy&&!stale&&frames.length>0;
   return <section className="own-solution" aria-label={t("Рабочая область моего решения")}>
-    <div className="own-intro"><div><strong>{t("Твой код. Твой ход решения.")}</strong><p>{t("Сохрани имя функции и параметры из шаблона. Внутренние переменные и алгоритм можно менять.")}</p></div><span className="draft-state">{stored?t("Черновик сохранён в браузере"):t("Черновик только в этой вкладке")}</span></div>
+    <div className="own-intro"><div><strong>{t("Твой код. Твой ход решения.")}</strong><p>{t("Сохрани имя функции и порядок входных параметров из шаблона. Имена параметров и внутренних переменных можно менять.")}</p></div><span className="draft-state">{stored?t("Черновик сохранён в браузере"):t("Черновик только в этой вкладке")}</span></div>
     {!stored&&<p className="storage-notice" role="alert">{t("Не удалось сохранить черновик в браузере. Скопируйте код перед закрытием вкладки.")}</p>}
     <div className="own-grid">
       <section className="visual-panel own-visual" aria-label={t("Визуализация моего решения")}>
         <header className="panel-heading"><strong>{t("Ваш запуск")}</strong><span className="play-status">{playable?`${step+1} / ${frames.length}`:'Python'}</span></header>
         <div className="example-toolbar"><label>{t("Пример")}<select aria-label={t("Пример моего решения")} value={selected} onChange={event=>{setSelected(Number(event.target.value));setStep(0);setPlaying(false);}}>{payload.examples.map((example,index)=><option value={index} key={index}>{index+1}. {locale==='en'?example.labelEn:example.label}</option>)}</select></label></div>
         <div className="own-summary" data-testid="own-summary" role="status">{summary}</div>
+        {!stale&&!!result?.bindings?.length&&<p className="runtime-footnote" data-testid="argument-binding">{t("Входные данные переданы по порядку шаблона: {0}",[result.bindings.map(binding=>`${binding.input} → ${binding.parameter}`).join(', ')])}</p>}
         {stale&&<p className="own-stale" data-testid="own-stale">{t("Код изменён после запуска. Перезапустите его: старая анимация и подсветка отключены.")}</p>}
         <div className="canvas own-canvas">{frame&&!stale?<UserScene frame={frame}/>:<div className="own-empty"><Icon name="play"/><strong>{stale?t("Нужен новый запуск"):t("Здесь появится выполнение твоего кода")}</strong><p>{t("Массивы, переменные, структуры и вызовы — из реального состояния Python.")}</p></div>}</div>
         {frame&&!stale&&<div className="step-explanation"><span className="step-badge">{step+1}</span><p aria-live="polite">{locale==='en'?frame.messageEn:frame.message}</p></div>}

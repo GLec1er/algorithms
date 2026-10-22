@@ -2,6 +2,7 @@
 import contextlib
 import copy
 import io
+import inspect
 import json
 import linecache
 import math
@@ -14,6 +15,40 @@ from . import structures
 
 class TraceLimitError(RuntimeError):
     pass
+
+
+def _bind_arguments(function, args):
+    """Preserve keyword calls; renamed parameters use the template input order.
+
+    Bind before executing: a TypeError raised inside the solution must never
+    cause a second invocation with different arguments.
+    """
+    try:
+        signature = inspect.signature(function)
+    except (ValueError, TypeError):
+        return (), args, []
+    try:
+        signature.bind(**args)
+        return (), args, []
+    except TypeError:
+        values = tuple(args.values())
+        try:
+            signature.bind(*values)
+        except TypeError as exc:
+            raise TypeError(
+                f'Function {signature} cannot accept the example inputs '
+                f'({", ".join(args)}). Keep the template parameter order '
+                'and the required number of arguments.'
+            ) from exc
+        positional = [parameter.name for parameter in signature.parameters.values()
+                      if parameter.kind in (inspect.Parameter.POSITIONAL_ONLY,
+                                            inspect.Parameter.POSITIONAL_OR_KEYWORD)]
+        variadic = next((parameter.name for parameter in signature.parameters.values()
+                         if parameter.kind == inspect.Parameter.VAR_POSITIONAL), None)
+        bindings = [dict(input=name, parameter=positional[index] if index < len(positional)
+                         else f'{variadic}[{index - len(positional)}]')
+                    for index, name in enumerate(args)]
+        return values, {}, bindings
 
 
 class BoundedOutput(io.StringIO):
@@ -35,6 +70,7 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
     output = BoundedOutput(notices)
     history, identity = {}, 0
     error, actual, passed = None, None, False
+    bindings = []
     trace_failure = None
     started = time.monotonic()
     recorded_size = 0
@@ -170,7 +206,8 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
             function = namespace.get(function_name)
             if not callable(function):
                 raise NameError(f'Определите функцию {function_name} с параметрами из шаблона.')
-            actual = function(**copy.deepcopy(args))
+            positional, keywords, bindings = _bind_arguments(function, copy.deepcopy(args))
+            actual = function(*positional, **keywords)
             sys.settrace(previous)
             if trace_failure is not None:
                 raise trace_failure
@@ -193,4 +230,4 @@ def run_solution(source, function_name, args, expected, frame_limit=1800):
         sys.settrace(previous)
         linecache.cache.pop(filename, None)
     freeze_budget[0] = 4000
-    return dict(frames=frames, result=freeze(actual), passed=passed, error=error, stdout=output.getvalue(), notices=sorted(notices))
+    return dict(frames=frames, result=freeze(actual), passed=passed, error=error, stdout=output.getvalue(), notices=sorted(notices), bindings=bindings)

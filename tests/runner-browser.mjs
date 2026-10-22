@@ -26,6 +26,13 @@ export async function checkRunner(browser,base,allReferences=false) {
       });}
       try {
         const own=await request({code:'def insertion_index(a, target):\n    position = 0\n    for number in a:\n        if number >= target:\n            return position\n        position += 1\n    return position\n',lessonId:'insertion_index',args:{a:[1,3,5,6],target:2},expected:1});
+        const woodPayload=await (await fetch(base+'lessons/cutting_wood.json')).json();
+        const woodCode='from typing import List\n\ndef cutting_wood(heights: List[int], k: int) -> int:\n    left, right = 0, max(heights)\n    while left < right:\n        mid = (right + left) // 2 + 1\n        if enough_wood(mid, k, heights):\n            left = mid\n        else:\n            right = mid - 1\n    return right\n\ndef enough_wood(mid, k, heights):\n    return sum(max(0, height - mid) for height in heights) >= k\n';
+        const wood=[];
+        for(const example of woodPayload.examples){
+          const run=await request({code:woodCode,lessonId:'cutting_wood',args:example.args,expected:example.expected});
+          wood.push({passed:run.passed,error:run.error,bindings:run.bindings,renamed:run.frames.some(frame=>'heights' in frame.state)});
+        }
         const failures=[];let total=0;
         for(const id of lessons){
           const payload=await (await fetch(base+'lessons/'+id+'.json')).json();
@@ -37,10 +44,12 @@ export async function checkRunner(browser,base,allReferences=false) {
         const invalid=await request({code:'def solve(:',lessonId:'solve',args:{},expected:1});
         const failure=await request({code:'def solve():\n    seen = [1]\n    return 1 / 0\n',lessonId:'solve',args:{},expected:1});
         const infinite=await request({code:'def solve():\n    while True:\n        pass\n',lessonId:'solve',args:{},expected:1});
-        return {own:{passed:own.passed,renamed:own.frames.some(frame=>frame.state.position===1)},total,failures,invalid:invalid.error,failure:{error:failure.error,partial:failure.frames.length,done:failure.frames.some(frame=>frame.done)},infinite:infinite.error};
+        return {own:{passed:own.passed,renamed:own.frames.some(frame=>frame.state.position===1)},wood,total,failures,invalid:invalid.error,failure:{error:failure.error,partial:failure.frames.length,done:failure.frames.some(frame=>frame.done)},infinite:infinite.error};
       }finally{worker.terminate();}
     },{workerUrl,lessons,base});
     assert.equal(report.own.passed,true);assert.equal(report.own.renamed,true);
+    assert.equal(report.wood.length,4);
+    for(const run of report.wood){assert.equal(run.passed,true);assert.equal(run.error,null);assert.equal(run.renamed,true);assert.deepEqual(run.bindings,[{input:'a',parameter:'heights'},{input:'k',parameter:'k'}]);}
     assert.equal(report.invalid.type,'SyntaxError');assert.equal(report.failure.error.type,'ZeroDivisionError');assert.equal(report.failure.error.line,3);assert.ok(report.failure.partial>0);assert.equal(report.failure.done,false);
     assert.equal(report.infinite.type,'TraceLimitError');assert.deepEqual(report.failures,[]);
     if(allReferences)assert.equal(report.total,404);
