@@ -6,22 +6,24 @@ export const asArray = (v:Value|undefined):Value[] => Array.isArray(v) ? v : [];
 export const asObject = (v:Value|undefined):Record<string,Value> => v && typeof v==='object' && !Array.isArray(v) ? v : {};
 
 const pointerNames = ['left','right','mid','i','j','write','low','high'];
-export function ArrayRow({name, values, frame, pointers=false, halfOpen=false}:{name:string;values:Value[];frame:Frame;pointers?:boolean;halfOpen?:boolean}) {
-  const entries = pointers ? pointerNames.filter(n=>typeof frame.state[n]==='number' && Number(frame.state[n])>=0 && Number(frame.state[n])<=values.length).map(n=>[n,Number(frame.state[n])] as const) : [];
-  const active = pointers ? Number(frame.state.mid ?? frame.state.i ?? frame.state.write ?? -1) : -1;
+export function ArrayRow({name, values, frame, pointers=false, halfOpen=false, answerIndex}:{name:string;values:Value[];frame:Frame;pointers?:boolean;halfOpen?:boolean;answerIndex?:number}) {
+  const answered=answerIndex!==undefined&&Number.isInteger(answerIndex)&&answerIndex>=0&&answerIndex<=values.length;
+  const entries = pointers&&!answered ? pointerNames.filter(n=>typeof frame.state[n]==='number' && Number(frame.state[n])>=0 && Number(frame.state[n])<=values.length).map(n=>[n,Number(frame.state[n])] as const) : [];
+  const active = pointers&&!answered ? Number(frame.state.mid ?? frame.state.i ?? frame.state.write ?? -1) : -1;
   const left=typeof frame.state.left==='number'?frame.state.left:undefined;
   const right=typeof frame.state.right==='number'?frame.state.right:undefined;
-  const slots = Math.max(1,values.length + (entries.some(([,i])=>i===values.length)?1:0));
+  const slots = Math.max(1,values.length + (entries.some(([,i])=>i===values.length)||answered&&answerIndex===values.length?1:0));
   return <div className="array-block">
     <div className="data-label"><span>{name}</span><small>{values.length} {name==='s'?t("симв."):t("эл.")}</small></div>
-    <div className="scene-scroll"><div className="array-track" style={{width:`calc(var(--array-slot, 58px) * ${slots})`,height:pointers?148:100}}>
+    <div className="scene-scroll"><div className="array-track" style={{width:`calc(var(--array-slot, 58px) * ${slots})`,height:answered?110:pointers?148:100}}>
       {!values.length && <span className="empty-data">{t("∅ пусто")}</span>}
       {values.map((v,i)=>{
-        const outside=pointers && left!==undefined && right!==undefined && (i<left || (halfOpen?i>=right:i>right));
+        const outside=pointers && !answered && left!==undefined && right!==undefined && (i<left || (halfOpen?i>=right:i>right));
         return <div key={frame.arrays?.[name]?.[i] ?? i} className={`array-cell ${i===active?'active':''} ${outside?'outside':''}`} style={{transform:`translateX(calc(var(--array-slot, 58px) * ${i}))`}}>
           <span className="cell-index">{i}</span><span className="cell-value">{pretty(v)}</span>
         </div>;
       })}
+      {answered&&<div className="insertion-marker" data-index={answerIndex} style={{left:`calc(var(--array-slot, 58px) * ${answerIndex})`}}><span>{t("Ответ")} {answerIndex}</span></div>}
       {entries.map(([n,i])=>{
         const same=entries.filter(([,j])=>j===i).findIndex(([m])=>m===n);
         return <div key={n} className={`array-pointer pointer-${n}`} style={{transform:`translateX(calc(var(--array-slot, 58px) * ${i}))`,top:88+same*24}}>{n}<span>↑</span></div>;

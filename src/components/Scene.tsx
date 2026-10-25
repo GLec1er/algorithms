@@ -65,6 +65,7 @@ function Circle({frame,input}:{frame:Frame;input:Record<string,Value>}) {
 
 export default function Scene({frame,lesson,input}:{frame:Frame;lesson:Lesson;input:Record<string,Value>}) {
   const state={...input,...frame.state};
+  const insertionAnswer=lesson.id==='insertion_index'&&frame.done&&typeof frame.result==='number'?frame.result:undefined;
   const excluded:string[]=[];
   let primary;
   if(lesson.scene==='intervals')primary=<Intervals frame={frame} input={input} id={lesson.id}/>;
@@ -81,10 +82,11 @@ export default function Scene({frame,lesson,input}:{frame:Frame;lesson:Lesson;in
   else{
     const names=['a','s','b','t','gas','cost','weights','values','coins','digits'].filter(n=>Array.isArray(state[n])||typeof state[n]==='string');
     const simple=names.filter(n=>!asArray(state[n]).some(Array.isArray));
-    primary=simple.length?<>{simple.map((n,i)=><ArrayRow name={n} key={n} values={typeof state[n]==='string'?[...String(state[n])]:asArray(state[n])} frame={frame} pointers={i===0} halfOpen={['insertion_index','first_last','weighted_selection','median_arrays','sort_array'].includes(lesson.id)}/>)}</>:<ScalarScene frame={frame}/>;
+    primary=simple.length?<>{simple.map((n,i)=><ArrayRow name={n} key={n} values={typeof state[n]==='string'?[...String(state[n])]:asArray(state[n])} frame={frame} pointers={i===0} answerIndex={i===0?insertionAnswer:undefined} halfOpen={['insertion_index','first_last','weighted_selection','median_arrays','sort_array'].includes(lesson.id)}/>)}</>:<ScalarScene frame={frame}/>;
   }
   return <div className={`scene scene-${lesson.scene}`}>
     {primary}
+    {insertionAnswer!==undefined&&<div className="insertion-result" data-testid="insertion-answer" role="status"><strong>{t("Ответ: индекс {0}",[insertionAnswer])}</strong><span>{!asArray(input.a).length?t("Вставить {0} в пустой массив",[pretty(input.target)]):insertionAnswer===asArray(input.a).length?t("Добавить {0} в конец массива",[pretty(input.target)]):t("Вставить {0} перед {1}",[pretty(input.target),pretty(asArray(input.a)[insertionAnswer])])}</span></div>}
     {frame.state.op&&<div className="operation"><span>{t("Текущая операция")}</span><code>{pretty(frame.state.op)}</code></div>}
     {lesson.scene==='hash'&&frame.state.seen&&!Array.isArray(frame.state.seen)&&<Dictionary name="seen" value={asObject(frame.state.seen)}/>}
     <Auxiliary frame={frame} exclude={[...excluded,...(lesson.scene==='intervals'?['result']:[]),...(lesson.scene==='hash'?['seen']:[])]}/>

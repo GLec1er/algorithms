@@ -74,7 +74,7 @@ export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payl
       <section className="visual-panel own-visual" aria-label={t("Визуализация моего решения")}>
         <header className="panel-heading"><strong>{t("Ваш запуск")}</strong><span className="play-status">{playable?`${step+1} / ${frames.length}`:'Python'}</span></header>
         <div className="example-toolbar"><label>{t("Пример")}<select aria-label={t("Пример моего решения")} value={selected} onChange={event=>{setSelected(Number(event.target.value));setStep(0);setPlaying(false);}}>{payload.examples.map((example,index)=><option value={index} key={index}>{index+1}. {locale==='en'?example.labelEn:example.label}</option>)}</select></label></div>
-        <div className="own-summary" data-testid="own-summary" role="status">{summary}</div>
+        <div className="own-summary" data-testid="own-summary">{summary}</div>
         {!stale&&!!result?.bindings?.length&&<p className="runtime-footnote" data-testid="argument-binding">{t("Входные данные переданы по порядку шаблона: {0}",[result.bindings.map(binding=>`${binding.input} → ${binding.parameter}`).join(', ')])}</p>}
         {stale&&<p className="own-stale" data-testid="own-stale">{t("Код изменён после запуска. Перезапустите его: старая анимация и подсветка отключены.")}</p>}
         <div className="canvas own-canvas">{frame&&!stale?<UserScene frame={frame}/>:<div className="own-empty"><Icon name="play"/><strong>{stale?t("Нужен новый запуск"):t("Здесь появится выполнение твоего кода")}</strong><p>{t("Массивы, переменные, структуры и вызовы — из реального состояния Python.")}</p></div>}</div>
@@ -88,12 +88,13 @@ export default function OwnSolution({lesson,payload}:{lesson:Lesson;payload:Payl
         <PythonEditor value={code} onChange={edit} line={!stale&&runSource===code?(result?.error?.line??frame?.line??undefined):undefined}/>
         <p className="editor-help" id="editor-help">{t("Tab — отступ · Shift+Tab — выйти из редактора. До 64 КБ кода.")}</p>
         <div className="own-run-actions"><button className="own-run" disabled={busy} onClick={()=>run(false)}><Icon name="play"/>{t("Запустить пример")}</button><button disabled={busy} onClick={()=>run(true)}>{t("Проверить все примеры")}</button>{busy&&<button className="own-stop" onClick={()=>stop()}>{t("Остановить")}</button>}</div>
+        <div className="editor-run-status" role="status">{summary}</div>
+    {failure&&<div className="own-error" role="alert">{failure}</div>}
+    {!stale&&result?.error&&<div className="own-error" role="alert"><strong>{result.error.type}{result.error.line?t(' · строка {0}',[result.error.line]):''}</strong><pre>{result.error.message}</pre>{frames.length>0&&<p>{t("До ошибки записано кадров:")}{' '}{frames.length}{t(". Их можно посмотреть в плеере.")}</p>}</div>}
         <p className="runtime-footnote">{t("При первом запуске загрузится Python. Вычисления идут в браузере; зависший запуск можно остановить.")}</p>
         {payload.support&&<details className="own-support"><summary>{t("Адаптеры структур данных")}</summary><p>{t("Доступны через")}{' '}<code>from curriculum.structures import …</code></p><pre>{payload.support}</pre></details>}
       </section>
     </div>
-    {failure&&<div className="own-error" role="alert">{failure}</div>}
-    {!stale&&result?.error&&<div className="own-error" role="alert"><strong>{result.error.type}{result.error.line?t(' · строка {0}',[result.error.line]):''}</strong><pre>{result.error.message}</pre>{frames.length>0&&<p>{t("До ошибки записано кадров:")}{' '}{frames.length}{t(". Их можно посмотреть в плеере.")}</p>}</div>}
     {Object.keys(runs).length>0&&<section className="own-results"><header><h2>{t("Результаты на примерах")}</h2><span>{t("Совпадение на примерах не доказывает корректность на всех входах.")}</span></header><div className="own-result-list">{payload.examples.map((example,index)=>{
       const run=runs[index];return <button key={index} aria-pressed={selected===index} onClick={()=>{setSelected(index);setStep(0);setPlaying(false);}} className={selected===index?'is-selected':''}><strong>{index+1}. {locale==='en'?example.labelEn:example.label}</strong><span className={stale?'':run?.passed?'result-ok':run?'result-bad':''}>{stale&&run?t("Устарело"):run?run.error?run.error.type:run.passed?t("Совпало"):t("Не совпало"):t("Не запускался")}</span></button>;
     })}</div></section>}

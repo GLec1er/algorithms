@@ -297,5 +297,13 @@
   "Некоторые пользовательские типы показаны текстом.": "Some user-defined types are displayed as text.",
   "Показаны первые 200 узлов структуры.": "Only the first 200 nodes are shown.",
   "Сохрани имя функции и порядок входных параметров из шаблона. Имена параметров и внутренних переменных можно менять.": "Keep the function name and input parameter order from the starter. You can rename parameters and internal variables.",
-  "Входные данные переданы по порядку шаблона: {0}": "Inputs passed in template order: {0}"
+  "Входные данные переданы по порядку шаблона: {0}": "Inputs passed in template order: {0}",
+  "Ответ": "Answer",
+  "Ответ: индекс {0}": "Answer: index {0}",
+  "Вставить {0} в пустой массив": "Insert {0} into the empty array",
+  "Добавить {0} в конец массива": "Append {0} to the array",
+  "Вставить {0} перед {1}": "Insert {0} before {1}",
+  "Выполнение завершено": "Execution complete",
+  "Вернуть описание задачи": "Show problem description",
+  "Сфокусироваться на разборе": "Focus on walkthrough"
 }
