@@ -1,0 +1,46 @@
+.study-tools { display:flex;align-items:center;gap:16px;justify-content:flex-end;margin:-12px 0 12px; }
+.study-tools button { min-height:40px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;font-size:12px;color:var(--ink);background:var(--card); }
+.study-tools button[aria-pressed='true'] { border-color:var(--accent);color:var(--accent); }
+.focus-title { font-size:23px;margin:8px 0 14px; }
+.study-focus .breadcrumb,.study-focus .lesson-intro { display:none; }
+.reference-workspace { scroll-margin-top:84px; }
+.study-focus { scroll-margin-top:84px; }
+.insertion-marker { position:absolute;top:12px;height:62px;width:3px;background:var(--ok);border-radius:2px; }
+.insertion-marker::before { content:'';position:absolute;left:-3px;top:-4px;border:5px solid transparent;border-top-color:var(--ok); }
+.insertion-marker span { position:absolute;top:68px;left:0;width:70px;font:11px var(--mono);color:var(--ok);white-space:nowrap; }
+.insertion-result { display:flex;flex-wrap:wrap;justify-content:center;gap:5px 12px;padding:8px 12px;margin-top:4px;border:1px solid var(--ok);border-radius:6px;background:var(--ok-soft);color:var(--ink);font-size:13px; }
+.insertion-result strong { color:var(--ok);font-weight:600; }
+.editor-run-status { padding:12px 22px 0;color:var(--accent);font-size:13px;overflow-wrap:anywhere; }
+.own-editor-panel .own-error { margin:12px 16px 0;padding:14px 16px;border-radius:8px;font-size:13px; }
+.own-editor-panel .own-error pre { font-size:12px; }
+@media(min-width:1101px) {
+  .study-focus .study-tools { position:sticky;top:72px;z-index:15;background:var(--bg);padding:6px 0;margin:0 0 8px; }
+  .study-focus .reference-workspace { scroll-margin-top:144px; }
+  .study-focus .reference-workspace > .visual-panel > .panel-heading { padding:8px 16px;min-height:40px; }
+  .study-focus .reference-workspace .example-toolbar { padding:4px 16px 8px;gap:8px; }
+  .study-focus .reference-workspace .canvas { height:224px;min-height:0;max-height:224px;padding:12px 16px; }
+  .study-focus .reference-workspace .scene { min-height:0; }
+  .study-focus .reference-workspace .scene > .array-block:first-child { padding-top:8px; }
+  .study-focus .reference-workspace .legend { padding:6px 12px;font-size:11px; }
+  .study-focus .reference-workspace .step-explanation { min-height:66px;padding:10px 14px;margin:0 12px;border-radius:8px; }
+  .study-focus .reference-workspace .transport { padding:8px 16px 6px;gap:8px; }
+  .study-focus .reference-workspace .timeline { padding:0 16px 8px; }
+  .study-focus .reference-workspace .code-panel > header { padding:10px 16px; }
+  .study-focus .reference-workspace .code-scroll { min-height:284px;max-height:320px;padding:12px 0; }
+  .study-focus .reference-workspace .code-panel > footer { padding:8px 16px; }
+  .study-focus .reference-workspace .variables-panel { margin-top:12px; }
+  .study-focus .reference-workspace .variables-toggle { padding:10px 16px; }
+  .study-focus .reference-workspace .variables { padding:0 16px 10px; }
+  .study-focus .reference-workspace .variables > div { padding:7px 0; }
+}
+@media(max-width:650px) {
+  .study-focus .reference-workspace { scroll-margin-top:124px; }
+  .study-tools { justify-content:stretch;flex-wrap:wrap;gap:8px; }
+  .study-current-task { width:100%; }
+  .study-tools button { width:100%;min-height:44px; }
+  .focus-title { font-size:21px; }
+  .editor-run-status { padding-inline:16px; }
+  .insertion-result { font-size:12px;justify-content:flex-start; }
+}
+
+.study-current-task { margin-right:auto;font-size:14px;min-width:0;overflow-wrap:anywhere; }

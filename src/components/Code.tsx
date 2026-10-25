@@ -8,7 +8,7 @@ export function Syntax({text}:{text:string}) {
   })}</>;
 }
 
-export default function Code({code,line,support,filename='solution'}:{code:string;line:number;support?:string;filename?:string}) {
+export default function Code({code,line,support,filename='solution',done=false}:{code:string;line:number;support?:string;filename?:string;done?:boolean}) {
   const container=useRef<HTMLDivElement>(null);
   const [helpers,setHelpers]=useState(false),[copied,setCopied]=useState(false);
   const shown=helpers?support??code:code;
@@ -21,6 +21,6 @@ export default function Code({code,line,support,filename='solution'}:{code:strin
     <header><div className="editor-file"><span className="python-file-icon">Py</span><span>{filename}.py</span><small>Python 3</small></div><button className="copy-button" onClick={copy} aria-label={t("Копировать Python-код")}>{copied?t("Скопировано"):t("Копировать")}</button></header>
     {support&&<div className="code-tabs"><button className={!helpers?'selected':''} onClick={()=>setHelpers(false)}>{t("Решение")}</button><button className={helpers?'selected':''} onClick={()=>setHelpers(true)}>{t("Структуры данных")}</button></div>}
     <div className="code-scroll" ref={container}><pre><code>{shown.split('\n').map((text,i)=><div className={`code-line ${!helpers&&i+1===line?'current':''}`} key={i}><span className="line-number">{i+1}</span><span className="line-source"><Syntax text={text}/></span></div>)}</code></pre></div>
-    <footer><span className="live-dot"/> {!helpers?t("Состояние до строки {0}",[line]):t("Адаптеры примеров · доступны в репозитории")}</footer>
+    <footer><span className="live-dot"/> {!helpers?done?t("Выполнение завершено"):t("Состояние до строки {0}",[line]):t("Адаптеры примеров · доступны в репозитории")}</footer>
   </section>;
 }

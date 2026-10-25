@@ -44,6 +44,10 @@ A highlighted line shows the state **before** that line runs. The final frame co
 
 Use the English/Russian selector at any time; it preserves your current example, frame and progress. Shared links can specify `?lang=en` or `?lang=ru` before the hash route. A fresh visit defaults to English regardless of browser language.
 
+## Reading a walkthrough
+
+Choose **Focus on walkthrough** on a problem page to hide the introductory block and use a compact desktop workspace. The problem title and **Show problem description** control remain available. Example and frame selection are preserved. Completed insertion-index examples mark the insertion position directly, including the end of the array and empty input. Execution messages and errors for your own code appear beside the Run controls.
+
 ## Your solutions
 
 Open a problem and choose **My solution**. Keep the function name and input parameter order, then write your code or copy the reference. Parameter names can differ: matching names use keyword binding; otherwise inputs are passed positionally in template order, with the mapping shown beside the replay. The submitted code is not rewritten. Run one or all four examples; inspect actual locals, calls, output, expected answers and partial traces before errors. Unsupported structures appear as data. The displayed complexity belongs to the reference, not an automatic analysis of your code.
